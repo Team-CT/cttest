@@ -36,7 +36,7 @@ jobs:
                   "url": "${{ github.event.issue.html_url }}"
                 },
                 "상태": {
-                  "status": {
+                  "select": {
                     "name": "시작 전"
                   }
                 }
