@@ -14,8 +14,10 @@ jobs:
         uses: actions/github-script@v6
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
-          # [수정됨] Secrets에 저장한 이름(NOTION_DATABASE_ID)과 똑같이 맞춤
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          # [기존] 이슈용 DB ID (기존에 쓰던 시크릿 그대로 사용)
+          NOTION_ISSUE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          # [신규] PR용 DB ID (방금 1단계에서 추가한 시크릿 이름)
+          NOTION_PR_ID: ${{ secrets.NOTION_PR_DATABASE_ID }}
         with:
           script: |
             // 1. 이벤트 정보 가져오기
@@ -25,6 +27,9 @@ jobs:
             
             const title = `[${isIssue ? 'Issue' : 'PR'}] #${item.number} ${item.title}`;
             const url = item.html_url;
+
+            // ★ 여기서 갈림길! 이슈면 이슈DB, PR이면 PR DB 선택
+            const targetDatabaseId = isIssue ? process.env.NOTION_ISSUE_ID : process.env.NOTION_PR_ID;
             
             // 2. Notion API 호출
             const response = await fetch('https://api.notion.com/v1/pages', {
@@ -35,8 +40,8 @@ jobs:
                 'Notion-Version': '2022-06-28'
               },
               body: JSON.stringify({
-                // [수정됨] 위에서 설정한 변수명 사용
-                parent: { database_id: process.env.NOTION_DATABASE_ID },
+                // 위에서 선택한 DB ID를 사용
+                parent: { database_id: targetDatabaseId },
                 properties: {
                   "Name": { 
                     title: [
@@ -51,7 +56,6 @@ jobs:
                     url: url
                   },
                   "Status": { 
-                    // 사진을 보니 '선택(Select)' 속성으로 잘 바꾸셨네요! 이대로 두면 됩니다.
                     select: {
                       name: "Not Started" 
                     }
@@ -64,5 +68,5 @@ jobs:
               const errorText = await response.text();
               core.setFailed(`Notion API Error: ${response.status} ${errorText}`);
             } else {
-              console.log("Successfully added to Notion!");
+              console.log(`Successfully added to ${isIssue ? 'Issue' : 'PR'} Database!`);
             }
