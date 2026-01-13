@@ -1,859 +1,332 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>대시보드 - SkyHR | 대한항공 HR 시스템</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    /* 대시보드 전용 스타일 */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 24px;
-    }
-
-    .chart-placeholder {
-      height: 250px;
-      background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-50) 100%);
-      border-radius: var(--border-radius);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--gray-400);
-      font-size: 0.9rem;
-    }
-
-    .quick-actions {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
-    .quick-action-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      padding: 20px 16px;
-      background: var(--white);
-      border: 2px solid var(--gray-200);
-      border-radius: var(--border-radius-lg);
-      cursor: pointer;
-      transition: all var(--transition-fast);
-    }
-
-    .quick-action-btn:hover {
-      border-color: var(--primary-blue);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .quick-action-btn i {
-      font-size: 1.5rem;
-      color: var(--primary-blue);
-    }
-
-    .quick-action-btn span {
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--gray-700);
-    }
-
-    .today-schedule {
-      margin-top: 16px;
-    }
-
-    .schedule-item {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--gray-100);
-    }
-
-    .schedule-item:last-child {
-      border-bottom: none;
-    }
-
-    .schedule-time {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--primary-blue);
-      min-width: 60px;
-    }
-
-    .schedule-info h4 {
-      font-size: 0.9rem;
-      font-weight: 500;
-      margin-bottom: 2px;
-    }
-
-    .schedule-info p {
-      font-size: 0.8rem;
-      color: var(--gray-500);
-    }
-
-    .notification-list {
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    .notification-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--gray-100);
-    }
-
-    .notification-item:last-child {
-      border-bottom: none;
-    }
-
-    .notification-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-      flex-shrink: 0;
-    }
-
-    .notification-icon.info {
-      background: var(--sky-blue-light);
-      color: var(--primary-blue);
-    }
-
-    .notification-icon.success {
-      background: #d1fae5;
-      color: var(--success);
-    }
-
-    .notification-icon.warning {
-      background: #fef3c7;
-      color: var(--warning);
-    }
-
-    .notification-content h4 {
-      font-size: 0.875rem;
-      font-weight: 500;
-      margin-bottom: 4px;
-    }
-
-    .notification-content p {
-      font-size: 0.8rem;
-      color: var(--gray-500);
-    }
-
-    .notification-time {
-      font-size: 0.7rem;
-      color: var(--gray-400);
-      margin-left: auto;
-      white-space: nowrap;
-    }
-
-    .attendance-status {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      padding: 20px;
-      background: linear-gradient(135deg, #4a90c2 0%, #6bb3e0 100%);
-      border-radius: var(--border-radius-lg);
-      color: var(--white);
-      margin-bottom: 24px;
-    }
-
-    .attendance-icon {
-      width: 60px;
-      height: 60px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-    }
-
-    .attendance-info h3 {
-      color: var(--white);
-      font-size: 1rem;
-      margin-bottom: 4px;
-    }
-
-    .attendance-info p {
-      font-size: 0.85rem;
-      opacity: 0.9;
-    }
-
-    .attendance-time {
-      margin-left: auto;
-      text-align: right;
-    }
-
-    .attendance-time .time {
-      font-size: 1.75rem;
-      font-weight: 700;
-    }
-
-    .attendance-time .label {
-      font-size: 0.75rem;
-      opacity: 0.8;
-    }
-
-    .btn-checkout {
-      background: rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: white;
-      padding: 10px 20px;
-      border-radius: var(--border-radius);
-      font-weight: 500;
-      margin-left: 16px;
-      transition: all var(--transition-fast);
-    }
-
-    .btn-checkout:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
-
-    .health-summary {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .health-item {
-      text-align: center;
-      padding: 16px;
-      background: var(--gray-50);
-      border-radius: var(--border-radius);
-    }
-
-    .health-score {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--primary-blue);
-    }
-
-    .health-label {
-      font-size: 0.8rem;
-      color: var(--gray-500);
-      margin-top: 4px;
-    }
-
-    .leave-balance {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    .leave-item {
-      padding: 14px;
-      background: var(--gray-50);
-      border-radius: var(--border-radius);
-    }
-
-    .leave-type {
-      font-size: 0.8rem;
-      color: var(--gray-500);
-      margin-bottom: 4px;
-    }
-
-    .leave-count {
-      font-size: 1.25rem;
-      font-weight: 600;
-    }
-
-    .leave-count span {
-      font-size: 0.85rem;
-      color: var(--gray-400);
-      font-weight: 400;
-    }
-
-    /* 반응형 */
-    @media (max-width: 1200px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .quick-actions {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 768px) {
-      .quick-actions {
-        grid-template-columns: 1fr;
-      }
-
-      .health-summary {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* 사용자 드롭다운 메뉴 */
-    .user-profile {
-      position: relative;
-      cursor: pointer;
-    }
-
-    .user-dropdown {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      margin-top: 8px;
-      background: var(--white);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-lg);
-      min-width: 180px;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(-10px);
-      transition: all 0.2s ease;
-      z-index: 1000;
-    }
-
-    .user-dropdown.show {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-
-    .dropdown-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      color: var(--gray-700);
-      font-size: 0.875rem;
-      text-decoration: none;
-      transition: background 0.15s ease;
-    }
-
-    .dropdown-item:hover {
-      background: var(--gray-50);
-    }
-
-    .dropdown-item i {
-      width: 16px;
-      color: var(--gray-400);
-    }
-
-    .dropdown-item.logout {
-      color: var(--error);
-    }
-
-    .dropdown-item.logout i {
-      color: var(--error);
-    }
-
-    .dropdown-divider {
-      height: 1px;
-      background: var(--gray-200);
-      margin: 4px 0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyHR - 통합 HR 시스템</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .ks-blue { background-color: #0065B3; } /* Korean Air Blue Style */
+        .ks-light-blue { background-color: #E1F0FA; }
+        .ks-text-blue { color: #0065B3; }
+    </style>
 </head>
-<body>
-  <div class="app-container">
-    <!-- 사이드바 -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <img src="images/korean-air-logo.svg" alt="대한항공" style="height: 28px; width: auto;">
+<body class="bg-slate-50 flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-slate-800 text-white flex-shrink-0 flex flex-col transition-all duration-300">
+        <div class="h-16 flex items-center px-6 border-b border-slate-700 bg-slate-900">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-plane-up text-sky-400 text-2xl"></i>
+                <div>
+                    <h1 class="font-bold text-lg tracking-wide">SkyHR</h1>
+                    <p class="text-[10px] text-slate-400">통합 HR 시스템</p>
+                </div>
+            </div>
         </div>
-        <div class="sidebar-logo" style="margin-top: 8px;">
-          <i class="fas fa-users-cog" style="font-size: 1.2rem;"></i>
-          <div>
-            <h1>SkyHR</h1>
-            <span>통합 HR 시스템</span>
-          </div>
+
+        <div class="p-6 border-b border-slate-700">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-slate-600 flex items-center justify-center text-sm font-bold">김</div>
+                <div>
+                    <p class="font-medium text-sm">김민수</p>
+                    <p class="text-xs text-slate-400">선임 승무원</p>
+                </div>
+            </div>
         </div>
-      </div>
-      <nav class="sidebar-nav">
-        <div class="nav-section">
-          <div class="nav-section-title">메인</div>
-          <a href="dashboard.html" class="nav-item active">
-            <i class="fas fa-home"></i>
-            <span>대시보드</span>
-          </a>
-        </div>
-        <div class="nav-section">
-          <div class="nav-section-title">직원 관리</div>
-          <a href="employees.html" class="nav-item">
-            <i class="fas fa-users"></i>
-            <span>직원 목록</span>
-          </a>
-          <a href="#" class="nav-item">
-            <i class="fas fa-sitemap"></i>
-            <span>부서 관리</span>
-          </a>
-        </div>
-        <div class="nav-section">
-          <div class="nav-section-title">근태 관리</div>
-          <a href="attendance.html" class="nav-item">
-            <i class="fas fa-clock"></i>
-            <span>근태 현황</span>
-          </a>
-          <a href="#" class="nav-item">
-            <i class="fas fa-calendar-alt"></i>
-            <span>휴가 신청</span>
-          </a>
-          <a href="#" class="nav-item">
-            <i class="fas fa-clipboard-check"></i>
-            <span>승인 관리</span>
-          </a>
-        </div>
-        <div class="nav-section">
-          <div class="nav-section-title">건강 관리</div>
-          <a href="health.html" class="nav-item">
-            <i class="fas fa-heartbeat"></i>
-            <span>건강 현황</span>
-          </a>
-          <a href="#" class="nav-item">
-            <i class="fas fa-poll"></i>
-            <span>스트레스 설문</span>
-          </a>
-          <a href="#" class="nav-item">
-            <i class="fas fa-spa"></i>
-            <span>건강 프로그램</span>
-          </a>
-        </div>
-        <div class="nav-section">
-          <div class="nav-section-title">기타</div>
-          <a href="#" class="nav-item">
-            <i class="fas fa-bullhorn"></i>
-            <span>게시판</span>
-          </a>
-          <a href="#" class="nav-item">
-            <i class="fas fa-file-alt"></i>
-            <span>리포트</span>
-          </a>
-          <a href="#" class="nav-item">
-            <i class="fas fa-cog"></i>
-            <span>설정</span>
-          </a>
-        </div>
-      </nav>
+
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1">
+                <li class="px-4 py-2">
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">메인</p>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 bg-sky-600 rounded-md text-white shadow-sm">
+                        <i class="fa-solid fa-house w-5 text-center"></i>
+                        <span class="text-sm font-medium">대시보드</span>
+                    </a>
+                </li>
+                
+                <li class="px-4 py-2 mt-4">
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">근태 관리</p>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 text-slate-300 hover:bg-slate-700 hover:text-white rounded-md transition-colors">
+                        <i class="fa-regular fa-clock w-5 text-center"></i>
+                        <span class="text-sm">근태 현황</span>
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 text-slate-300 hover:bg-slate-700 hover:text-white rounded-md transition-colors">
+                        <i class="fa-regular fa-calendar-check w-5 text-center"></i>
+                        <span class="text-sm">휴가 신청</span>
+                    </a>
+                </li>
+
+                <li class="px-4 py-2 mt-4">
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">건강 관리</p>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 text-slate-300 hover:bg-slate-700 hover:text-white rounded-md transition-colors">
+                        <i class="fa-solid fa-heart-pulse w-5 text-center"></i>
+                        <span class="text-sm">나의 건강 현황</span>
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 text-slate-300 hover:bg-slate-700 hover:text-white rounded-md transition-colors">
+                        <i class="fa-solid fa-clipboard-list w-5 text-center"></i>
+                        <span class="text-sm">스트레스 설문</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </aside>
 
-    <!-- 메인 컨텐츠 -->
-    <main class="main-content">
-      <!-- 헤더 -->
-      <header class="header">
-        <div class="header-left">
-          <div class="breadcrumb">
-            <a href="#">홈</a>
-            <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
-            <span class="current">대시보드</span>
-          </div>
-        </div>
-        <div class="header-right">
-          <button class="header-icon-btn">
-            <i class="fas fa-search"></i>
-          </button>
-          <button class="header-icon-btn">
-            <i class="fas fa-bell"></i>
-            <span class="notification-badge">3</span>
-          </button>
-          <div class="user-profile" onclick="toggleUserMenu()">
-            <div class="user-avatar">김</div>
-            <div class="user-info">
-              <div class="user-name">김민수</div>
-              <div class="user-role">객실 승무원</div>
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 flex-shrink-0">
+            <div class="flex items-center text-sm text-slate-500">
+                <i class="fa-solid fa-house mr-2"></i> 홈 <i class="fa-solid fa-chevron-right mx-2 text-xs"></i> <span class="font-bold text-slate-800">대시보드</span>
             </div>
-            <i class="fas fa-chevron-down" style="color: var(--gray-400); font-size: 0.75rem;"></i>
-            <!-- 드롭다운 메뉴 -->
-            <div class="user-dropdown" id="userDropdown">
-              <a href="#" class="dropdown-item">
-                <i class="fas fa-user"></i> 내 프로필
-              </a>
-              <a href="#" class="dropdown-item">
-                <i class="fas fa-cog"></i> 설정
-              </a>
-              <div class="dropdown-divider"></div>
-              <a href="#" class="dropdown-item logout" onclick="handleLogout(event)">
-                <i class="fas fa-sign-out-alt"></i> 로그아웃
-              </a>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <!-- 페이지 컨텐츠 -->
-      <div class="page-content">
-        <!-- 출근 상태 배너 -->
-        <div class="attendance-status">
-          <div class="attendance-icon">
-            <i class="fas fa-check-circle"></i>
-          </div>
-          <div class="attendance-info">
-            <h3>오늘의 근무 상태</h3>
-            <p>정상 출근 완료 · 2026년 1월 12일 (월)</p>
-          </div>
-          <div class="attendance-time">
-            <div class="time">08:45</div>
-            <div class="label">출근 시간</div>
-          </div>
-          <button class="btn-checkout">
-            <i class="fas fa-sign-out-alt"></i> 퇴근하기
-          </button>
-        </div>
-
-        <!-- 빠른 실행 -->
-        <div class="quick-actions">
-          <button class="quick-action-btn">
-            <i class="fas fa-calendar-plus"></i>
-            <span>휴가 신청</span>
-          </button>
-          <button class="quick-action-btn">
-            <i class="fas fa-poll-h"></i>
-            <span>설문 참여</span>
-          </button>
-          <button class="quick-action-btn">
-            <i class="fas fa-spa"></i>
-            <span>건강 프로그램</span>
-          </button>
-          <button class="quick-action-btn">
-            <i class="fas fa-file-invoice"></i>
-            <span>급여 명세서</span>
-          </button>
-        </div>
-
-        <!-- 통계 카드 -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon blue">
-              <i class="fas fa-calendar-check"></i>
-            </div>
-            <div class="stat-content">
-              <h3>이번 달 근무일</h3>
-              <div class="stat-value">18<span style="font-size: 1rem; color: var(--gray-400);">/22일</span></div>
-              <div class="stat-change positive">
-                <i class="fas fa-arrow-up"></i> 정상 근무 중
-              </div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon green">
-              <i class="fas fa-plane-departure"></i>
-            </div>
-            <div class="stat-content">
-              <h3>누적 비행시간</h3>
-              <div class="stat-value">847<span style="font-size: 1rem; color: var(--gray-400);">시간</span></div>
-              <div class="stat-change positive">
-                <i class="fas fa-arrow-up"></i> 이번 달 +62시간
-              </div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon gold">
-              <i class="fas fa-umbrella-beach"></i>
-            </div>
-            <div class="stat-content">
-              <h3>잔여 연차</h3>
-              <div class="stat-value">12<span style="font-size: 1rem; color: var(--gray-400);">일</span></div>
-              <div class="stat-change">
-                <span style="color: var(--gray-500);">총 15일 중</span>
-              </div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon red">
-              <i class="fas fa-heart"></i>
-            </div>
-            <div class="stat-content">
-              <h3>건강 점수</h3>
-              <div class="stat-value">82<span style="font-size: 1rem; color: var(--gray-400);">점</span></div>
-              <div class="stat-change positive">
-                <i class="fas fa-arrow-up"></i> 지난달 대비 +5점
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 대시보드 그리드 -->
-        <div class="dashboard-grid">
-          <!-- 왼쪽 컬럼 -->
-          <div>
-            <!-- 이번 주 일정 -->
-            <div class="card mb-4">
-              <div class="card-header">
-                <h3 class="card-title">
-                  <i class="fas fa-calendar-week" style="color: var(--primary-blue); margin-right: 8px;"></i>
-                  이번 주 일정
-                </h3>
-                <a href="#" class="btn btn-sm btn-secondary">전체보기</a>
-              </div>
-              <div class="card-body">
-                <div class="today-schedule">
-                  <div class="schedule-item">
-                    <div class="schedule-time">08:00</div>
-                    <div class="schedule-info">
-                      <h4>KE001 인천 → 뉴욕 (JFK)</h4>
-                      <p>A380-800 · 비행시간 14시간 20분</p>
-                    </div>
-                    <span class="badge badge-primary">오늘</span>
-                  </div>
-                  <div class="schedule-item">
-                    <div class="schedule-time">10:30</div>
-                    <div class="schedule-info">
-                      <h4>안전 교육 이수</h4>
-                      <p>본사 교육센터 3층</p>
-                    </div>
-                    <span class="badge badge-warning">내일</span>
-                  </div>
-                  <div class="schedule-item">
-                    <div class="schedule-time">14:00</div>
-                    <div class="schedule-info">
-                      <h4>KE017 인천 → 파리 (CDG)</h4>
-                      <p>B777-300ER · 비행시간 12시간 30분</p>
-                    </div>
-                    <span class="badge badge-gray">1/15</span>
-                  </div>
-                  <div class="schedule-item">
-                    <div class="schedule-time">09:00</div>
-                    <div class="schedule-info">
-                      <h4>건강 검진</h4>
-                      <p>지정 병원 방문</p>
-                    </div>
-                    <span class="badge badge-success">1/17</span>
-                  </div>
+            <div class="flex items-center gap-6">
+                <i class="fa-solid fa-magnifying-glass text-slate-400 cursor-pointer hover:text-slate-600"></i>
+                <div class="relative">
+                    <i class="fa-regular fa-bell text-slate-500 text-lg cursor-pointer hover:text-slate-700"></i>
+                    <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                 </div>
-              </div>
+                <div class="flex items-center gap-2 border-l pl-6">
+                    <div class="w-8 h-8 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center font-bold text-xs border border-sky-200">K</div>
+                    <span class="text-sm font-medium text-slate-700">김민수 님</span>
+                </div>
             </div>
+        </header>
 
-            <!-- 잔여 휴가 현황 -->
-            <div class="card">
-              <div class="card-header">
-                <h3 class="card-title">
-                  <i class="fas fa-umbrella-beach" style="color: var(--accent-gold); margin-right: 8px;"></i>
-                  휴가 현황
-                </h3>
-                <a href="#" class="btn btn-sm btn-primary">휴가 신청</a>
-              </div>
-              <div class="card-body">
-                <div class="leave-balance">
-                  <div class="leave-item">
-                    <div class="leave-type">연차</div>
-                    <div class="leave-count">12일 <span>/ 15일</span></div>
-                    <div class="progress mt-2">
-                      <div class="progress-bar blue" style="width: 80%;"></div>
-                    </div>
-                  </div>
-                  <div class="leave-item">
-                    <div class="leave-type">월차</div>
-                    <div class="leave-count">1일 <span>/ 1일</span></div>
-                    <div class="progress mt-2">
-                      <div class="progress-bar green" style="width: 100%;"></div>
-                    </div>
-                  </div>
-                  <div class="leave-item">
-                    <div class="leave-type">보상 휴가</div>
-                    <div class="leave-count">3일 <span>/ 5일</span></div>
-                    <div class="progress mt-2">
-                      <div class="progress-bar yellow" style="width: 60%;"></div>
-                    </div>
-                  </div>
-                  <div class="leave-item">
-                    <div class="leave-type">특별 휴가</div>
-                    <div class="leave-count">0일 <span>/ 2일</span></div>
-                    <div class="progress mt-2">
-                      <div class="progress-bar red" style="width: 0%;"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="flex-1 overflow-y-auto p-8 bg-slate-50">
+            <div class="max-w-7xl mx-auto space-y-6">
 
-          <!-- 오른쪽 컬럼 -->
-          <div>
-            <!-- 건강 요약 -->
-            <div class="card mb-4">
-              <div class="card-header">
-                <h3 class="card-title">
-                  <i class="fas fa-heartbeat" style="color: var(--error); margin-right: 8px;"></i>
-                  나의 건강 현황
-                </h3>
-              </div>
-              <div class="card-body">
-                <div class="health-summary">
-                  <div class="health-item">
-                    <div class="health-score">82</div>
-                    <div class="health-label">종합 점수</div>
-                  </div>
-                  <div class="health-item">
-                    <div class="health-score" style="color: var(--success);">A</div>
-                    <div class="health-label">피로도</div>
-                  </div>
-                  <div class="health-item">
-                    <div class="health-score" style="color: var(--warning);">B+</div>
-                    <div class="health-label">스트레스</div>
-                  </div>
+                <div class="bg-gradient-to-r from-sky-600 to-blue-700 rounded-xl p-6 text-white shadow-lg flex justify-between items-center relative overflow-hidden">
+                    <div class="z-10">
+                        <div class="flex items-center gap-2 mb-1 opacity-90">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span class="text-sm font-medium">오늘의 근무 상태</span>
+                        </div>
+                        <h2 class="text-2xl font-bold">정상 출근 완료 <span class="text-lg font-normal opacity-80 ml-2">- 2026년 1월 13일 (화)</span></h2>
+                    </div>
+                    <div class="text-right z-10">
+                        <p class="text-4xl font-bold mb-1">08:45</p>
+                        <p class="text-xs opacity-70 mb-3">출근 시간</p>
+                        <button class="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/40 px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i> 퇴근하기
+                        </button>
+                    </div>
+                    <div class="absolute -right-10 -bottom-16 w-64 h-64 bg-white/10 rounded-full blur-2xl"></div>
                 </div>
-                <div class="mt-4">
-                  <div class="d-flex justify-between mb-2">
-                    <span style="font-size: 0.85rem; color: var(--gray-600);">최근 설문 참여</span>
-                    <span style="font-size: 0.85rem; font-weight: 600;">7일 전</span>
-                  </div>
-                  <a href="#" class="btn btn-outline btn-sm" style="width: 100%;">
-                    <i class="fas fa-poll"></i> 설문 참여하기
-                  </a>
-                </div>
-              </div>
-            </div>
 
-            <!-- 알림 -->
-            <div class="card">
-              <div class="card-header">
-                <h3 class="card-title">
-                  <i class="fas fa-bell" style="color: var(--primary-blue); margin-right: 8px;"></i>
-                  최근 알림
-                </h3>
-                <a href="#" style="font-size: 0.8rem;">모두 보기</a>
-              </div>
-              <div class="card-body">
-                <div class="notification-list">
-                  <div class="notification-item">
-                    <div class="notification-icon success">
-                      <i class="fas fa-check"></i>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <i class="fa-regular fa-calendar text-lg"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-slate-500 text-sm font-medium">이번 달 근무일</h3>
+                        <div class="flex items-end gap-2 mt-1">
+                            <span class="text-2xl font-bold text-slate-800">18</span>
+                            <span class="text-sm text-slate-400 mb-1">/ 22일</span>
+                        </div>
+                        <p class="text-xs text-green-600 mt-2 flex items-center gap-1 font-medium"><i class="fa-solid fa-arrow-up"></i> 정상 근무 중</p>
                     </div>
-                    <div class="notification-content">
-                      <h4>휴가 승인 완료</h4>
-                      <p>1/20 연차 신청이 승인되었습니다</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
+                                <i class="fa-solid fa-plane text-lg"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-slate-500 text-sm font-medium">누적 비행시간</h3>
+                        <div class="flex items-end gap-2 mt-1">
+                            <span class="text-2xl font-bold text-slate-800">847</span>
+                            <span class="text-sm text-slate-400 mb-1">시간</span>
+                        </div>
+                        <p class="text-xs text-green-600 mt-2 flex items-center gap-1 font-medium"><i class="fa-solid fa-arrow-up"></i> 이번 달 +62시간</p>
                     </div>
-                    <span class="notification-time">1시간 전</span>
-                  </div>
-                  <div class="notification-item">
-                    <div class="notification-icon info">
-                      <i class="fas fa-plane"></i>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center">
+                                <i class="fa-solid fa-umbrella-beach text-lg"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-slate-500 text-sm font-medium">잔여 연차</h3>
+                        <div class="flex items-end gap-2 mt-1">
+                            <span class="text-2xl font-bold text-slate-800">12</span>
+                            <span class="text-sm text-slate-400 mb-1">일</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2">총 15일 중 사용 3일</p>
                     </div>
-                    <div class="notification-content">
-                      <h4>비행 일정 변경</h4>
-                      <p>KE001 출발 시간이 08:00로 변경</p>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-red-50 text-red-500 flex items-center justify-center">
+                                <i class="fa-solid fa-heart-pulse text-lg"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-slate-500 text-sm font-medium">건강 점수</h3>
+                        <div class="flex items-end gap-2 mt-1">
+                            <span class="text-2xl font-bold text-slate-800">82</span>
+                            <span class="text-sm text-slate-400 mb-1">점</span>
+                        </div>
+                        <p class="text-xs text-green-600 mt-2 flex items-center gap-1 font-medium"><i class="fa-solid fa-arrow-up"></i> 지난달 대비 +5점</p>
                     </div>
-                    <span class="notification-time">3시간 전</span>
-                  </div>
-                  <div class="notification-item">
-                    <div class="notification-icon warning">
-                      <i class="fas fa-exclamation"></i>
-                    </div>
-                    <div class="notification-content">
-                      <h4>설문 참여 요청</h4>
-                      <p>1월 스트레스 설문에 참여해주세요</p>
-                    </div>
-                    <span class="notification-time">1일 전</span>
-                  </div>
-                  <div class="notification-item">
-                    <div class="notification-icon info">
-                      <i class="fas fa-bullhorn"></i>
-                    </div>
-                    <div class="notification-content">
-                      <h4>공지사항</h4>
-                      <p>2026년 휴무일 안내</p>
-                    </div>
-                    <span class="notification-time">2일 전</span>
-                  </div>
                 </div>
-              </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fa-regular fa-calendar-days text-slate-400"></i> 이번 주 일정</h3>
+                            <button class="text-xs text-slate-500 hover:text-sky-600 border px-2 py-1 rounded">전체보기</button>
+                        </div>
+
+                        <div class="space-y-6 relative">
+                            <div class="absolute left-[5.5rem] top-2 bottom-2 w-0.5 bg-slate-100"></div>
+
+                            <div class="flex items-start relative">
+                                <div class="w-20 text-right pr-6 pt-1">
+                                    <span class="block font-bold text-slate-800">08:00</span>
+                                </div>
+                                <div class="w-3 h-3 bg-blue-500 rounded-full mt-2 absolute left-[5.2rem] border-2 border-white z-10"></div>
+                                <div class="flex-1 bg-blue-50 rounded-lg p-4 ml-6">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <h4 class="font-bold text-slate-800">KE001 인천 <i class="fa-solid fa-arrow-right mx-1 text-xs"></i> 뉴욕 (JFK)</h4>
+                                        <span class="bg-blue-200 text-blue-800 text-[10px] px-2 py-0.5 rounded-full font-bold">오늘</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500">A380-800 • 비행시간 14시간 20분</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start relative">
+                                <div class="w-20 text-right pr-6 pt-1">
+                                    <span class="block font-bold text-slate-800">10:30</span>
+                                </div>
+                                <div class="w-3 h-3 bg-yellow-400 rounded-full mt-2 absolute left-[5.2rem] border-2 border-white z-10"></div>
+                                <div class="flex-1 bg-white border border-slate-100 rounded-lg p-4 ml-6 hover:bg-slate-50 transition-colors">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <h4 class="font-bold text-slate-800">안전 교육 이수</h4>
+                                        <span class="bg-yellow-100 text-yellow-700 text-[10px] px-2 py-0.5 rounded-full font-bold">내일</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500">본사 교육센터 3층</p>
+                                </div>
+                            </div>
+
+                             <div class="flex items-start relative">
+                                <div class="w-20 text-right pr-6 pt-1">
+                                    <span class="block font-bold text-slate-800">14:00</span>
+                                </div>
+                                <div class="w-3 h-3 bg-slate-300 rounded-full mt-2 absolute left-[5.2rem] border-2 border-white z-10"></div>
+                                <div class="flex-1 bg-white border border-slate-100 rounded-lg p-4 ml-6 hover:bg-slate-50 transition-colors">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <h4 class="font-bold text-slate-800">KE017 인천 <i class="fa-solid fa-arrow-right mx-1 text-xs"></i> 파리 (CDG)</h4>
+                                        <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-bold">1/15</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500">B777-300ER • 비행시간 12시간 30분</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        
+                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                            <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-red-500"><i class="fa-solid fa-heart-pulse"></i> 나의 건강 현황</h3>
+                            <div class="grid grid-cols-3 gap-2 text-center mb-6">
+                                <div class="bg-slate-50 rounded-lg py-3">
+                                    <span class="block text-xl font-bold text-slate-800">82</span>
+                                    <span class="text-[10px] text-slate-400">종합 점수</span>
+                                </div>
+                                <div class="bg-green-50 rounded-lg py-3">
+                                    <span class="block text-xl font-bold text-green-600">A</span>
+                                    <span class="text-[10px] text-slate-400">피로도</span>
+                                </div>
+                                <div class="bg-orange-50 rounded-lg py-3">
+                                    <span class="block text-xl font-bold text-orange-500">B+</span>
+                                    <span class="text-[10px] text-slate-400">스트레스</span>
+                                </div>
+                            </div>
+                            <button class="w-full py-2 border border-slate-300 rounded-lg text-sm text-slate-600 font-medium hover:bg-slate-50 transition-colors">
+                                <i class="fa-solid fa-clipboard-list mr-1"></i> 설문 참여하기
+                            </button>
+                        </div>
+
+                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-bell text-slate-400"></i> 최근 알림</h3>
+                                <span class="text-xs text-blue-500 cursor-pointer">모두 보기</span>
+                            </div>
+                            <ul class="space-y-4">
+                                <li class="flex gap-3">
+                                    <div class="mt-1 w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0 text-xs"><i class="fa-solid fa-check"></i></div>
+                                    <div>
+                                        <p class="text-sm font-bold text-slate-800">휴가 승인 완료</p>
+                                        <p class="text-xs text-slate-500">1/20 연차 신청이 승인되었습니다.</p>
+                                        <p class="text-[10px] text-slate-400 mt-1">1시간 전</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3">
+                                    <div class="mt-1 w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 text-xs"><i class="fa-solid fa-plane"></i></div>
+                                    <div>
+                                        <p class="text-sm font-bold text-slate-800">비행 일정 변경</p>
+                                        <p class="text-xs text-slate-500">KE001 출발 시간이 08:00로 변경</p>
+                                        <p class="text-[10px] text-slate-400 mt-1">3시간 전</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-umbrella-beach text-yellow-500"></i> 휴가 현황</h3>
+                        <button class="bg-sky-600 hover:bg-sky-700 text-white text-xs px-3 py-1.5 rounded transition-colors font-medium">휴가 신청</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-slate-500 font-medium">연차</span>
+                                <div><span class="font-bold text-lg text-slate-800">12일</span> <span class="text-slate-400 text-xs">/ 15일</span></div>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2">
+                                <div class="bg-sky-600 h-2 rounded-full" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-slate-500 font-medium">병가</span>
+                                <div><span class="font-bold text-lg text-slate-800">1일</span> <span class="text-slate-400 text-xs">/ 1일</span></div>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 100%"></div>
+                            </div>
+                        </div>
+                         <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-slate-500 font-medium">보상 휴가</span>
+                                <div><span class="font-bold text-lg text-slate-800">3일</span> <span class="text-slate-400 text-xs">/ 5일</span></div>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2">
+                                <div class="bg-orange-400 h-2 rounded-full" style="width: 60%"></div>
+                            </div>
+                        </div>
+                         <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-slate-500 font-medium">특별 휴가</span>
+                                <div><span class="font-bold text-lg text-slate-800">0일</span> <span class="text-slate-400 text-xs">/ 2일</span></div>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2">
+                                <div class="bg-slate-300 h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-          </div>
+            <div class="h-10"></div>
         </div>
-      </div>
     </main>
-  </div>
-  <script src="js/api.js"></script>
-  <script>
-    // 페이지 로드 시 데이터 가져오기
-    document.addEventListener('DOMContentLoaded', async function() {
-      // 로그인 체크
-      if (!TokenManager.isLoggedIn()) {
-        window.location.href = 'login.html';
-        return;
-      }
-
-      try {
-        // 대시보드 데이터 로드
-        const dashboard = await DashboardAPI.getDashboard();
-        updateDashboard(dashboard);
-      } catch (error) {
-        console.error('대시보드 로드 실패:', error);
-      }
-
-      // 사용자 정보 업데이트
-      const user = TokenManager.getUserInfo();
-      if (user) {
-        document.querySelector('.user-name').textContent = user.name;
-        document.querySelector('.user-role').textContent = user.position || user.department;
-        document.querySelector('.user-avatar').textContent = user.name.charAt(0);
-      }
-    });
-
-    function updateDashboard(data) {
-      // 출근 상태 업데이트
-      if (data.checkedIn && data.checkInTime) {
-        const time = new Date(data.checkInTime);
-        const timeStr = time.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-        document.querySelector('.attendance-time .time').textContent = timeStr;
-      }
-
-      // 날짜 업데이트
-      const dateEl = document.querySelector('.attendance-info p');
-      if (dateEl && data.workDate) {
-        dateEl.textContent = `정상 출근 완료 · ${data.workDate}`;
-      }
-
-      // 통계 업데이트
-      if (data.monthlyWorkDays !== undefined) {
-        const workDaysEl = document.querySelector('.stat-value');
-        if (workDaysEl) {
-          workDaysEl.innerHTML = `${data.monthlyWorkDays}<span style="font-size: 1rem; color: var(--gray-400);">/${data.totalWorkDays || 22}일</span>`;
-        }
-      }
-    }
-
-    // 퇴근 버튼
-    document.querySelector('.btn-checkout')?.addEventListener('click', async function() {
-      try {
-        await AttendanceAPI.checkOut();
-        alert('퇴근 처리되었습니다.');
-        location.reload();
-      } catch (error) {
-        alert(error.message || '퇴근 처리에 실패했습니다.');
-      }
-    });
-
-    // 사용자 드롭다운 토글
-    function toggleUserMenu() {
-      const dropdown = document.getElementById('userDropdown');
-      dropdown.classList.toggle('show');
-    }
-
-    // 외부 클릭 시 드롭다운 닫기
-    document.addEventListener('click', function(e) {
-      const userProfile = document.querySelector('.user-profile');
-      const dropdown = document.getElementById('userDropdown');
-      if (userProfile && !userProfile.contains(e.target)) {
-        dropdown.classList.remove('show');
-      }
-    });
-
-    // 로그아웃 처리
-    function handleLogout(event) {
-      event.preventDefault();
-      event.stopPropagation();
-      
-      if (confirm('로그아웃 하시겠습니까?')) {
-        TokenManager.logout();
-      }
-    }
-  </script>
 </body>
 </html>
-
