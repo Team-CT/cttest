@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스트레스 설문 - SkyHR | 대한항공 HR 시스템</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .survey-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .survey-header {
+      background: linear-gradient(135deg, #4a90c2 0%, #6bb3e0 100%);
+      border-radius: var(--border-radius-lg);
+      padding: 30px;
+      color: white;
+      margin-bottom: 24px;
+    }
+
+    .survey-header h1 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .survey-header p {
+      opacity: 0.9;
+      font-size: 0.9rem;
+    }
+
+    .survey-progress {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .survey-progress::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 50px;
+      right: 50px;
+      height: 3px;
+      background: var(--gray-200);
+      z-index: 0;
+    }
+
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 1;
+      cursor: pointer;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: var(--gray-500);
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .progress-step.active .step-circle {
+      background: linear-gradient(135deg, #4a90c2 0%, #6bb3e0 100%);
+      color: white;
+    }
+
+    .progress-step.completed .step-circle {
+      background: #10b981;
+      color: white;
+    }
+
+    .step-label {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      text-align: center;
+    }
+
+    .progress-step.active .step-label,
+    .progress-step.completed .step-label {
+      color: var(--gray-700);
+      font-weight: 500;
+    }
+
+    .survey-card {
+      background: var(--white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 30px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .survey-card.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .survey-section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--gray-100);
+    }
+
+    .section-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #4a90c2 0%, #6bb3e0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.25rem;
+    }
+
+    .section-icon.green { background: linear-gradient(135deg, #10b981 0%, #34d399 100%); }
+    .section-icon.purple { background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); }
+    .section-icon.orange { background: linear-gradient(135deg, #f97316 0%, #fb923c 100%); }
+
+    .section-info h2 {
+      font-size: 1.1rem;
+      color: var(--gray-800);
+      margin-bottom: 4px;
+    }
+
+    .section-info p {
+      font-size: 0.85rem;
+      color: var(--gray-500);
+    }
+
+    .flight-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-box {
+      background: var(--gray-50);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #4a90c2;
+    }
+
+    .stat-value.green { color: #10b981; }
+    .stat-value.purple { color: #8b5cf6; }
+    .stat-value.orange { color: #f97316; }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--gray-600);
+      margin-top: 4px;
+    }
+
+    .question-item {
+      margin-bottom: 24px;
+    }
+
+    .question-text {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: 16px;
+    }
+
+    .question-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      background: #4a90c2;
+      color: white;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      margin-right: 10px;
+    }
+
+    .rating-scale {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .rating-option {
+      flex: 1;
+      text-align: center;
+    }
+
+    .rating-option input {
+      display: none;
+    }
+
+    .rating-option label {
+      display: block;
+      padding: 16px 8px;
+      background: var(--gray-50);
+      border: 2px solid var(--gray-200);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .rating-option input:checked + label {
+      background: linear-gradient(135deg, #4a90c2 0%, #6bb3e0 100%);
+      border-color: #4a90c2;
+      color: white;
+    }
+
+    .rating-option label:hover {
+      border-color: #4a90c2;
+    }
+
+    .rating-value {
+      font-size: 1.25rem;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .rating-label {
+      font-size: 0.7rem;
+    }
+
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+
+    .survey-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    .btn-survey {
+      padding: 14px 32px;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-prev {
+      background: var(--gray-100);
+      color: var(--gray-600);
+      border: none;
+    }
+
+    .btn-prev:hover {
+      background: var(--gray-200);
+    }
+
+    .btn-prev:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-next {
+      background: linear-gradient(135deg, #4a90c2 0%, #6bb3e0 100%);
+      color: white;
+      border: none;
+    }
+
+    .btn-next:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(74, 144, 194, 0.3);
+    }
+
+    .btn-submit {
+      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+      color: white;
+      border: none;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    /* 기본 정보 페이지 스타일 */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .info-item {
+      background: var(--gray-50);
+      padding: 16px;
+      border-radius: var(--border-radius);
+    }
+
+    .info-item label {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .info-item .value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gray-800);
+    }
+
+    .notice-box {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      border-radius: var(--border-radius);
+      padding: 16px;
+      margin-top: 24px;
+    }
+
+    .notice-box h4 {
+      color: #b45309;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .notice-box ul {
+      color: #92400e;
+      font-size: 0.9rem;
+      padding-left: 20px;
+    }
+
+    .notice-box li {
+      margin-bottom: 4px;
+    }
+
+    /* 결과 페이지 스타일 */
+    .result-summary {
+      text-align: center;
+      padding: 40px 0;
+    }
+
+    .result-score {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4a90c2 0%, #6bb3e0 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      color: white;
+    }
+
+    .result-score .score {
+      font-size: 3rem;
+      font-weight: 700;
+    }
+
+    .result-score .label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .result-grade {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .result-grade.good { color: #10b981; }
+    .result-grade.normal { color: #f59e0b; }
+    .result-grade.bad { color: #ef4444; }
+
+    .result-message {
+      color: var(--gray-600);
+      margin-bottom: 32px;
+    }
+
+    .result-details {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .result-detail-item {
+      background: var(--gray-50);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      text-align: center;
+    }
+
+    .result-detail-item .detail-label {
+      font-size: 0.85rem;
+      color: var(--gray-500);
+      margin-bottom: 8px;
+    }
+
+    .result-detail-item .detail-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #4a90c2;
+    }
+
+    .result-detail-item .detail-grade {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 12px;
+      margin-top: 8px;
+      display: inline-block;
+    }
+
+    .grade-good { background: #d1fae5; color: #059669; }
+    .grade-normal { background: #fef3c7; color: #d97706; }
+    .grade-bad { background: #fee2e2; color: #dc2626; }
+
+    .recommend-section {
+      margin-top: 32px;
+      padding: 24px;
+      background: #eff6ff;
+      border-radius: var(--border-radius);
+      text-align: left;
+    }
+
+    .recommend-section h4 {
+      color: #1e40af;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .recommend-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .recommend-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: white;
+      padding: 12px 16px;
+      border-radius: var(--border-radius);
+    }
+
+    .recommend-item i {
+      color: #4a90c2;
+    }
+
+    /* 텍스트 영역 스타일 */
+    .text-input-area {
+      margin-top: 16px;
+    }
+
+    .text-input-area textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--border-radius);
+      font-family: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .text-input-area textarea:focus {
+      outline: none;
+      border-color: #4a90c2;
+    }
+
+    .text-input-area label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--gray-600);
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-plane" style="font-size: 1.5rem;"></i>
+          <div>
+            <h1>SkyHR</h1>
+            <span>Korean Air HR System</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">메인</div>
+          <a href="/dashboard" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>대시보드</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">직원 관리</div>
+          <a href="/employees" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>직원 목록</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-sitemap"></i>
+            <span>부서 관리</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">근태 관리</div>
+          <a href="/attendance" class="nav-item">
+            <i class="fas fa-clock"></i>
+            <span>근태 현황</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-calendar-alt"></i>
+            <span>휴가 신청</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-clipboard-check"></i>
+            <span>승인 관리</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">건강 관리</div>
+          <a href="/health" class="nav-item">
+            <i class="fas fa-heartbeat"></i>
+            <span>건강 현황</span>
+          </a>
+          <a href="/stress-survey" class="nav-item active">
+            <i class="fas fa-poll"></i>
+            <span>스트레스 설문</span>
+          </a>
+          <a href="/health-program" class="nav-item">
+            <i class="fas fa-spa"></i>
+            <span>건강 프로그램</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">기타</div>
+          <a href="#" class="nav-item">
+            <i class="fas fa-bullhorn"></i>
+            <span>게시판</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-file-alt"></i>
+            <span>리포트</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>설정</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+      <!-- 헤더 -->
+      <header class="header">
+        <div class="header-left">
+          <div class="breadcrumb">
+            <a href="#">홈</a>
+            <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+            <a href="/health">건강 관리</a>
+            <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+            <span class="current">스트레스 설문</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <button class="header-icon-btn">
+            <i class="fas fa-search"></i>
+          </button>
+          <button class="header-icon-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-profile">
+            <div class="user-avatar">김</div>
+            <div class="user-info">
+              <div class="user-name">김민수</div>
+              <div class="user-role">객실 승무원</div>
+            </div>
+            <i class="fas fa-chevron-down" style="color: var(--gray-400); font-size: 0.75rem;"></i>
+          </div>
+        </div>
+      </header>
+
+      <!-- 페이지 컨텐츠 -->
+      <div class="page-content">
+        <div class="survey-container">
+          <!-- 설문 헤더 -->
+          <div class="survey-header">
+            <h1><i class="fas fa-clipboard-list"></i> 스트레스 자가진단 설문</h1>
+            <p>본 설문은 직원 건강관리 프로그램의 일환으로 진행됩니다. 솔직하게 답변해 주세요.</p>
+          </div>
+
+          <!-- 진행 단계 -->
+          <div class="survey-progress">
+            <div class="progress-step active" data-step="1" onclick="goToStep(1)">
+              <div class="step-circle">1</div>
+              <span class="step-label">기본 정보</span>
+            </div>
+            <div class="progress-step" data-step="2" onclick="goToStep(2)">
+              <div class="step-circle">2</div>
+              <span class="step-label">비행 스트레스</span>
+            </div>
+            <div class="progress-step" data-step="3" onclick="goToStep(3)">
+              <div class="step-circle">3</div>
+              <span class="step-label">시차 영향</span>
+            </div>
+            <div class="progress-step" data-step="4" onclick="goToStep(4)">
+              <div class="step-circle">4</div>
+              <span class="step-label">근무 패턴</span>
+            </div>
+            <div class="progress-step" data-step="5" onclick="goToStep(5)">
+              <div class="step-circle">5</div>
+              <span class="step-label">결과 확인</span>
+            </div>
+          </div>
+
+          <!-- Step 1: 기본 정보 -->
+          <div class="survey-card active" id="step1">
+            <div class="survey-section-title">
+              <div class="section-icon">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="section-info">
+                <h2>기본 정보 확인</h2>
+                <p>설문 응답자 정보를 확인해주세요</p>
+              </div>
+            </div>
+
+            <div class="info-grid">
+              <div class="info-item">
+                <label>이름</label>
+                <div class="value">김민수</div>
+              </div>
+              <div class="info-item">
+                <label>사번</label>
+                <div class="value">EMP001</div>
+              </div>
+              <div class="info-item">
+                <label>부서</label>
+                <div class="value">객실 승무원</div>
+              </div>
+              <div class="info-item">
+                <label>직급</label>
+                <div class="value">선임 승무원</div>
+              </div>
+              <div class="info-item">
+                <label>입사일</label>
+                <div class="value">2020-03-15</div>
+              </div>
+              <div class="info-item">
+                <label>마지막 설문일</label>
+                <div class="value">2025-12-15</div>
+              </div>
+            </div>
+
+            <div class="notice-box">
+              <h4><i class="fas fa-info-circle"></i> 설문 안내</h4>
+              <ul>
+                <li>본 설문은 약 5~10분 정도 소요됩니다.</li>
+                <li>모든 응답은 익명으로 처리되며, 개인별 건강관리 목적으로만 사용됩니다.</li>
+                <li>솔직하게 응답해 주시면 더 정확한 건강 분석이 가능합니다.</li>
+                <li>설문 중간에 저장되며, 나중에 이어서 작성할 수 있습니다.</li>
+              </ul>
+            </div>
+
+            <div class="survey-actions">
+              <button class="btn-survey btn-prev" disabled>
+                <i class="fas fa-arrow-left"></i> 이전
+              </button>
+              <button class="btn-survey btn-next" onclick="nextStep()">
+                설문 시작하기 <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: 비행 스트레스 -->
+          <div class="survey-card" id="step2">
+            <div class="role-badge">
+              <i class="fas fa-plane"></i>
+              객실 승무원 / 기장 전용 설문
+            </div>
+
+            <div class="survey-section-title">
+              <div class="section-icon">
+                <i class="fas fa-plane-departure"></i>
+              </div>
+              <div class="section-info">
+                <h2>A. 비행시간 기반 스트레스 지수</h2>
+                <p>최근 비행 데이터를 기반으로 스트레스 수준을 측정합니다</p>
+              </div>
+            </div>
+
+            <!-- 비행시간 통계 -->
+            <div class="flight-stats">
+              <div class="stat-box">
+                <div class="stat-value">48<span style="font-size: 1rem;">시간</span></div>
+                <div class="stat-label">최근 7일 비행시간</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value">156<span style="font-size: 1rem;">시간</span></div>
+                <div class="stat-label">최근 30일 비행시간</div>
+              </div>
+            </div>
+
+            <!-- 질문 1 -->
+            <div class="question-item">
+              <div class="question-text">
+                <span class="question-number">1</span>
+                최근 비행 시간으로 인해 피로 또는 스트레스를 느끼고 있습니까?
+              </div>
+              <div class="rating-scale">
+                <div class="rating-option">
+                  <input type="radio" name="q1" id="q1-1" value="1">
+                  <label for="q1-1">
+                    <span class="rating-value">1</span>
+                    <span class="rating-label">전혀<br>아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q1" id="q1-2" value="2">
+                  <label for="q1-2">
+                    <span class="rating-value">2</span>
+                    <span class="rating-label">아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q1" id="q1-3" value="3">
+                  <label for="q1-3">
+                    <span class="rating-value">3</span>
+                    <span class="rating-label">보통<br>이다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q1" id="q1-4" value="4">
+                  <label for="q1-4">
+                    <span class="rating-value">4</span>
+                    <span class="rating-label">그렇다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q1" id="q1-5" value="5">
+                  <label for="q1-5">
+                    <span class="rating-value">5</span>
+                    <span class="rating-label">매우<br>그렇다</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- 질문 2 -->
+            <div class="question-item">
+              <div class="question-text">
+                <span class="question-number">2</span>
+                비행 후 충분한 휴식을 취하고 있다고 생각하십니까?
+              </div>
+              <div class="rating-scale">
+                <div class="rating-option">
+                  <input type="radio" name="q2" id="q2-1" value="1">
+                  <label for="q2-1">
+                    <span class="rating-value">1</span>
+                    <span class="rating-label">전혀<br>아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q2" id="q2-2" value="2">
+                  <label for="q2-2">
+                    <span class="rating-value">2</span>
+                    <span class="rating-label">아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q2" id="q2-3" value="3">
+                  <label for="q2-3">
+                    <span class="rating-value">3</span>
+                    <span class="rating-label">보통<br>이다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q2" id="q2-4" value="4">
+                  <label for="q2-4">
+                    <span class="rating-value">4</span>
+                    <span class="rating-label">그렇다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q2" id="q2-5" value="5">
+                  <label for="q2-5">
+                    <span class="rating-value">5</span>
+                    <span class="rating-label">매우<br>그렇다</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- 질문 3 -->
+            <div class="question-item">
+              <div class="question-text">
+                <span class="question-number">3</span>
+                비행 중 긴장감이나 불안감을 느끼는 경우가 있습니까?
+              </div>
+              <div class="rating-scale">
+                <div class="rating-option">
+                  <input type="radio" name="q3" id="q3-1" value="1">
+                  <label for="q3-1">
+                    <span class="rating-value">1</span>
+                    <span class="rating-label">전혀<br>아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q3" id="q3-2" value="2">
+                  <label for="q3-2">
+                    <span class="rating-value">2</span>
+                    <span class="rating-label">아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q3" id="q3-3" value="3">
+                  <label for="q3-3">
+                    <span class="rating-value">3</span>
+                    <span class="rating-label">보통<br>이다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q3" id="q3-4" value="4">
+                  <label for="q3-4">
+                    <span class="rating-value">4</span>
+                    <span class="rating-label">그렇다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q3" id="q3-5" value="5">
+                  <label for="q3-5">
+                    <span class="rating-value">5</span>
+                    <span class="rating-label">매우<br>그렇다</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="survey-actions">
+              <button class="btn-survey btn-prev" onclick="prevStep()">
+                <i class="fas fa-arrow-left"></i> 이전
+              </button>
+              <button class="btn-survey btn-next" onclick="nextStep()">
+                다음 <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: 시차 영향 -->
+          <div class="survey-card" id="step3">
+            <div class="role-badge">
+              <i class="fas fa-globe"></i>
+              국제선 비행 승무원 전용
+            </div>
+
+            <div class="survey-section-title">
+              <div class="section-icon green">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="section-info">
+                <h2>B. 시차 적응 및 수면 영향</h2>
+                <p>시차로 인한 신체 리듬 변화와 수면의 질을 측정합니다</p>
+              </div>
+            </div>
+
+            <!-- 시차 통계 -->
+            <div class="flight-stats">
+              <div class="stat-box">
+                <div class="stat-value green">3<span style="font-size: 1rem;">회</span></div>
+                <div class="stat-label">최근 7일 시차 변경 횟수</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value green">-9<span style="font-size: 1rem;">시간</span></div>
+                <div class="stat-label">최근 시차 (LA 노선)</div>
+              </div>
+            </div>
+
+            <!-- 질문 4 -->
+            <div class="question-item">
+              <div class="question-text">
+                <span class="question-number">4</span>
+                시차 변경 후 정상적인 수면 패턴을 회복하는 데 어려움을 겪고 계십니까?
+              </div>
+              <div class="rating-scale">
+                <div class="rating-option">
+                  <input type="radio" name="q4" id="q4-1" value="1">
+                  <label for="q4-1">
+                    <span class="rating-value">1</span>
+                    <span class="rating-label">전혀<br>아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q4" id="q4-2" value="2">
+                  <label for="q4-2">
+                    <span class="rating-value">2</span>
+                    <span class="rating-label">아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q4" id="q4-3" value="3">
+                  <label for="q4-3">
+                    <span class="rating-value">3</span>
+                    <span class="rating-label">보통<br>이다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q4" id="q4-4" value="4">
+                  <label for="q4-4">
+                    <span class="rating-value">4</span>
+                    <span class="rating-label">그렇다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q4" id="q4-5" value="5">
+                  <label for="q4-5">
+                    <span class="rating-value">5</span>
+                    <span class="rating-label">매우<br>그렇다</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- 질문 5 -->
+            <div class="question-item">
+              <div class="question-text">
+                <span class="question-number">5</span>
+                최근 7일간 평균 수면 시간은 어떻게 되십니까?
+              </div>
+              <div class="rating-scale">
+                <div class="rating-option">
+                  <input type="radio" name="q5" id="q5-1" value="1">
+                  <label for="q5-1">
+                    <span class="rating-value">1</span>
+                    <span class="rating-label">4시간<br>미만</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q5" id="q5-2" value="2">
+                  <label for="q5-2">
+                    <span class="rating-value">2</span>
+                    <span class="rating-label">4~5<br>시간</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q5" id="q5-3" value="3">
+                  <label for="q5-3">
+                    <span class="rating-value">3</span>
+                    <span class="rating-label">5~6<br>시간</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q5" id="q5-4" value="4">
+                  <label for="q5-4">
+                    <span class="rating-value">4</span>
+                    <span class="rating-label">6~7<br>시간</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q5" id="q5-5" value="5">
+                  <label for="q5-5">
+                    <span class="rating-value">5</span>
+                    <span class="rating-label">7시간<br>이상</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- 질문 6 -->
+            <div class="question-item">
+              <div class="question-text">
+                <span class="question-number">6</span>
+                시차로 인해 두통, 소화불량 등 신체적 증상을 경험하십니까?
+              </div>
+              <div class="rating-scale">
+                <div class="rating-option">
+                  <input type="radio" name="q6" id="q6-1" value="1">
+                  <label for="q6-1">
+                    <span class="rating-value">1</span>
+                    <span class="rating-label">전혀<br>아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q6" id="q6-2" value="2">
+                  <label for="q6-2">
+                    <span class="rating-value">2</span>
+                    <span class="rating-label">아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q6" id="q6-3" value="3">
+                  <label for="q6-3">
+                    <span class="rating-value">3</span>
+                    <span class="rating-label">보통<br>이다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q6" id="q6-4" value="4">
+                  <label for="q6-4">
+                    <span class="rating-value">4</span>
+                    <span class="rating-label">그렇다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q6" id="q6-5" value="5">
+                  <label for="q6-5">
+                    <span class="rating-value">5</span>
+                    <span class="rating-label">매우<br>그렇다</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="survey-actions">
+              <button class="btn-survey btn-prev" onclick="prevStep()">
+                <i class="fas fa-arrow-left"></i> 이전
+              </button>
+              <button class="btn-survey btn-next" onclick="nextStep()">
+                다음 <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 4: 근무 패턴 -->
+          <div class="survey-card" id="step4">
+            <div class="survey-section-title">
+              <div class="section-icon purple">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <div class="section-info">
+                <h2>C. 근무 패턴 및 업무 스트레스</h2>
+                <p>근무 일정과 업무 환경으로 인한 스트레스를 측정합니다</p>
+              </div>
+            </div>
+
+            <!-- 근무 통계 -->
+            <div class="flight-stats">
+              <div class="stat-box">
+                <div class="stat-value purple">22<span style="font-size: 1rem;">일</span></div>
+                <div class="stat-label">최근 30일 근무일수</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value purple">4<span style="font-size: 1rem;">일</span></div>
+                <div class="stat-label">최근 연속 근무일</div>
+              </div>
+            </div>
+
+            <!-- 질문 7 -->
+            <div class="question-item">
+              <div class="question-text">
+                <span class="question-number">7</span>
+                현재 근무 스케줄이 개인 생활과 균형을 이루고 있다고 생각하십니까?
+              </div>
+              <div class="rating-scale">
+                <div class="rating-option">
+                  <input type="radio" name="q7" id="q7-1" value="1">
+                  <label for="q7-1">
+                    <span class="rating-value">1</span>
+                    <span class="rating-label">전혀<br>아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q7" id="q7-2" value="2">
+                  <label for="q7-2">
+                    <span class="rating-value">2</span>
+                    <span class="rating-label">아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q7" id="q7-3" value="3">
+                  <label for="q7-3">
+                    <span class="rating-value">3</span>
+                    <span class="rating-label">보통<br>이다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q7" id="q7-4" value="4">
+                  <label for="q7-4">
+                    <span class="rating-value">4</span>
+                    <span class="rating-label">그렇다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q7" id="q7-5" value="5">
+                  <label for="q7-5">
+                    <span class="rating-value">5</span>
+                    <span class="rating-label">매우<br>그렇다</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- 질문 8 -->
+            <div class="question-item">
+              <div class="question-text">
+                <span class="question-number">8</span>
+                업무량이나 업무 강도가 과도하다고 느끼십니까?
+              </div>
+              <div class="rating-scale">
+                <div class="rating-option">
+                  <input type="radio" name="q8" id="q8-1" value="1">
+                  <label for="q8-1">
+                    <span class="rating-value">1</span>
+                    <span class="rating-label">전혀<br>아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q8" id="q8-2" value="2">
+                  <label for="q8-2">
+                    <span class="rating-value">2</span>
+                    <span class="rating-label">아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q8" id="q8-3" value="3">
+                  <label for="q8-3">
+                    <span class="rating-value">3</span>
+                    <span class="rating-label">보통<br>이다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q8" id="q8-4" value="4">
+                  <label for="q8-4">
+                    <span class="rating-value">4</span>
+                    <span class="rating-label">그렇다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q8" id="q8-5" value="5">
+                  <label for="q8-5">
+                    <span class="rating-value">5</span>
+                    <span class="rating-label">매우<br>그렇다</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- 질문 9 -->
+            <div class="question-item">
+              <div class="question-text">
+                <span class="question-number">9</span>
+                동료 및 상사와의 관계에서 스트레스를 느끼십니까?
+              </div>
+              <div class="rating-scale">
+                <div class="rating-option">
+                  <input type="radio" name="q9" id="q9-1" value="1">
+                  <label for="q9-1">
+                    <span class="rating-value">1</span>
+                    <span class="rating-label">전혀<br>아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q9" id="q9-2" value="2">
+                  <label for="q9-2">
+                    <span class="rating-value">2</span>
+                    <span class="rating-label">아니다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q9" id="q9-3" value="3">
+                  <label for="q9-3">
+                    <span class="rating-value">3</span>
+                    <span class="rating-label">보통<br>이다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q9" id="q9-4" value="4">
+                  <label for="q9-4">
+                    <span class="rating-value">4</span>
+                    <span class="rating-label">그렇다</span>
+                  </label>
+                </div>
+                <div class="rating-option">
+                  <input type="radio" name="q9" id="q9-5" value="5">
+                  <label for="q9-5">
+                    <span class="rating-value">5</span>
+                    <span class="rating-label">매우<br>그렇다</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- 추가 의견 -->
+            <div class="text-input-area">
+              <label><i class="fas fa-comment-alt"></i> 추가로 전달하고 싶은 의견이 있으시면 작성해 주세요 (선택)</label>
+              <textarea placeholder="업무 환경, 스케줄, 건강 관련 건의사항 등을 자유롭게 작성해 주세요..."></textarea>
+            </div>
+
+            <div class="survey-actions">
+              <button class="btn-survey btn-prev" onclick="prevStep()">
+                <i class="fas fa-arrow-left"></i> 이전
+              </button>
+              <button class="btn-survey btn-next" onclick="nextStep()">
+                결과 확인 <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 5: 결과 확인 -->
+          <div class="survey-card" id="step5">
+            <div class="survey-section-title">
+              <div class="section-icon orange">
+                <i class="fas fa-chart-pie"></i>
+              </div>
+              <div class="section-info">
+                <h2>설문 결과</h2>
+                <p>귀하의 스트레스 자가진단 결과입니다</p>
+              </div>
+            </div>
+
+            <div class="result-summary">
+              <div class="result-score">
+                <span class="score">72</span>
+                <span class="label">/ 100점</span>
+              </div>
+              <div class="result-grade normal">양호 (B+)</div>
+              <p class="result-message">
+                전반적인 스트레스 수준은 관리 가능한 범위입니다.<br>
+                일부 항목에서 주의가 필요하며, 권장 프로그램 참여를 고려해 주세요.
+              </p>
+            </div>
+
+            <div class="result-details">
+              <div class="result-detail-item">
+                <div class="detail-label">비행 스트레스</div>
+                <div class="detail-value">78</div>
+                <span class="detail-grade grade-good">양호</span>
+              </div>
+              <div class="result-detail-item">
+                <div class="detail-label">시차 영향</div>
+                <div class="detail-value">65</div>
+                <span class="detail-grade grade-normal">주의</span>
+              </div>
+              <div class="result-detail-item">
+                <div class="detail-label">근무 패턴</div>
+                <div class="detail-value">73</div>
+                <span class="detail-grade grade-good">양호</span>
+              </div>
+            </div>
+
+            <div class="recommend-section">
+              <h4><i class="fas fa-lightbulb"></i> 맞춤 건강 프로그램 추천</h4>
+              <div class="recommend-list">
+                <div class="recommend-item">
+                  <i class="fas fa-bed"></i>
+                  <div>
+                    <strong>수면 개선 프로그램</strong>
+                    <span style="color: var(--gray-500); font-size: 0.85rem;"> - 시차 적응과 수면 품질 향상</span>
+                  </div>
+                </div>
+                <div class="recommend-item">
+                  <i class="fas fa-spa"></i>
+                  <div>
+                    <strong>휴식 프로그램 (명상/요가)</strong>
+                    <span style="color: var(--gray-500); font-size: 0.85rem;"> - 심신 안정과 스트레스 해소</span>
+                  </div>
+                </div>
+                <div class="recommend-item">
+                  <i class="fas fa-comments"></i>
+                  <div>
+                    <strong>1:1 심리 상담</strong>
+                    <span style="color: var(--gray-500); font-size: 0.85rem;"> - 전문 상담사와 함께하는 맞춤 케어</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="survey-actions">
+              <button class="btn-survey btn-prev" onclick="prevStep()">
+                <i class="fas fa-arrow-left"></i> 다시 수정
+              </button>
+              <button class="btn-survey btn-submit" onclick="submitSurvey()">
+                <i class="fas fa-check"></i> 설문 제출하기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let currentStep = 1;
+    const totalSteps = 5;
+
+    function updateProgressBar() {
+      const steps = document.querySelectorAll('.progress-step');
+      steps.forEach((step, index) => {
+        const stepNum = index + 1;
+        step.classList.remove('active', 'completed');
+        
+        if (stepNum < currentStep) {
+          step.classList.add('completed');
+          step.querySelector('.step-circle').innerHTML = '<i class="fas fa-check"></i>';
+        } else if (stepNum === currentStep) {
+          step.classList.add('active');
+          step.querySelector('.step-circle').textContent = stepNum;
+        } else {
+          step.querySelector('.step-circle').textContent = stepNum;
+        }
+      });
+    }
+
+    function showStep(step) {
+      // 모든 카드 숨기기
+      document.querySelectorAll('.survey-card').forEach(card => {
+        card.classList.remove('active');
+      });
+      
+      // 현재 단계 카드 표시
+      document.getElementById('step' + step).classList.add('active');
+      
+      // 진행바 업데이트
+      updateProgressBar();
+      
+      // 스크롤 상단으로
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function nextStep() {
+      if (currentStep < totalSteps) {
+        currentStep++;
+        showStep(currentStep);
+      }
+    }
+
+    function prevStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        showStep(currentStep);
+      }
+    }
+
+    function goToStep(step) {
+      // 이미 완료된 단계나 현재 단계로만 이동 가능
+      if (step <= currentStep) {
+        currentStep = step;
+        showStep(currentStep);
+      }
+    }
+
+    function submitSurvey() {
+      alert('설문이 제출되었습니다!\n\n결과는 건강 현황 페이지에서 확인하실 수 있습니다.');
+      window.location.href = '/health';
+    }
+
+    // 초기화
+    document.addEventListener('DOMContentLoaded', function() {
+      showStep(1);
+    });
+  </script>
+</body>
+</html>
