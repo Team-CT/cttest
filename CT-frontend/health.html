@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>건강 관리 - SkyHR | 대한항공 HR 시스템</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* 건강 관리 전용 스타일 */
+    .health-hero {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, #0066cc 50%, #004990 100%);
+      border-radius: var(--border-radius-lg);
+      padding: 32px;
+      color: var(--white);
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .health-hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 60%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+    }
+
+    .health-hero-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .health-hero-left h2 {
+      font-size: 1.5rem;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .health-hero-left p {
+      opacity: 0.9;
+      font-size: 0.95rem;
+    }
+
+    .health-score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .score-value {
+      font-size: 3rem;
+      font-weight: 700;
+    }
+
+    .score-label {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    .health-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .metric-card {
+      background: var(--white);
+      border-radius: var(--border-radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+    }
+
+    .metric-card.fatigue::before { background: var(--success); }
+    .metric-card.stress::before { background: var(--warning); }
+    .metric-card.jetlag::before { background: var(--info); }
+    .metric-card.workload::before { background: var(--error); }
+
+    .metric-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .metric-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .metric-card.fatigue .metric-icon { background: #d1fae5; color: var(--success); }
+    .metric-card.stress .metric-icon { background: #fef3c7; color: var(--warning); }
+    .metric-card.jetlag .metric-icon { background: #dbeafe; color: var(--info); }
+    .metric-card.workload .metric-icon { background: #fee2e2; color: var(--error); }
+
+    .metric-grade {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .metric-card.fatigue .metric-grade { color: var(--success); }
+    .metric-card.stress .metric-grade { color: var(--warning); }
+    .metric-card.jetlag .metric-grade { color: var(--info); }
+    .metric-card.workload .metric-grade { color: var(--error); }
+
+    .metric-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 4px;
+    }
+
+    .metric-desc {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+    }
+
+    .metric-progress {
+      margin-top: 16px;
+    }
+
+    .metric-progress-bar {
+      height: 6px;
+      background: var(--gray-200);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .metric-progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+
+    .metric-card.fatigue .metric-progress-fill { background: var(--success); }
+    .metric-card.stress .metric-progress-fill { background: var(--warning); }
+    .metric-card.jetlag .metric-progress-fill { background: var(--info); }
+    .metric-card.workload .metric-progress-fill { background: var(--error); }
+
+    .health-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    /* 설문 카드 */
+    .survey-card {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border-radius: var(--border-radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .survey-icon {
+      width: 60px;
+      height: 60px;
+      background: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--warning);
+      box-shadow: var(--shadow-md);
+    }
+
+    .survey-content {
+      flex: 1;
+    }
+
+    .survey-content h3 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .survey-content p {
+      font-size: 0.85rem;
+      color: #92400e;
+    }
+
+    .survey-btn {
+      background: var(--white);
+      color: #92400e;
+      padding: 12px 24px;
+      border: none;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .survey-btn:hover {
+      background: var(--gray-100);
+      transform: translateY(-2px);
+    }
+
+    /* 건강 프로그램 */
+    .program-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .program-card {
+      background: var(--white);
+      border-radius: var(--border-radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      transition: all var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .program-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .program-image {
+      height: 120px;
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      color: var(--white);
+    }
+
+    .program-image.counseling { background: linear-gradient(135deg, #10b981 0%, #34d399 100%); }
+    .program-image.exercise { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
+    .program-image.rest { background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); }
+
+    .program-content {
+      padding: 16px;
+    }
+
+    .program-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .program-desc {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      margin-bottom: 12px;
+    }
+
+    .program-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.75rem;
+      color: var(--gray-400);
+    }
+
+    /* 설문 결과 차트 영역 */
+    .chart-container {
+      background: var(--white);
+      border-radius: var(--border-radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .chart-placeholder {
+      height: 250px;
+      background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-50) 100%);
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-400);
+    }
+
+    /* 건강 팁 */
+    .health-tips {
+      background: var(--white);
+      border-radius: var(--border-radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .tip-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .tip-item:last-child {
+      border-bottom: none;
+    }
+
+    .tip-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--sky-blue-light);
+      color: var(--primary-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .tip-content h4 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .tip-content p {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      line-height: 1.5;
+    }
+
+    /* 부서별 건강 현황 (관리자용) */
+    .department-health {
+      margin-top: 32px;
+    }
+
+    .dept-health-row {
+      display: flex;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .dept-health-row:hover {
+      background: var(--gray-50);
+    }
+
+    .dept-name {
+      flex: 1;
+      font-weight: 600;
+    }
+
+    .dept-score {
+      width: 80px;
+      text-align: center;
+    }
+
+    .dept-score-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .dept-progress {
+      flex: 2;
+      padding: 0 24px;
+    }
+
+    .dept-stats {
+      display: flex;
+      gap: 16px;
+    }
+
+    .dept-stat {
+      text-align: center;
+    }
+
+    .dept-stat-value {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .dept-stat-label {
+      font-size: 0.7rem;
+      color: var(--gray-500);
+    }
+
+    /* 반응형 */
+    @media (max-width: 1200px) {
+      .health-metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .health-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .program-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .health-metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .program-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .health-hero-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-plane" style="font-size: 1.5rem;"></i>
+          <div>
+            <h1>SkyHR</h1>
+            <span>Korean Air HR System</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">메인</div>
+          <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>대시보드</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">직원 관리</div>
+          <a href="employees.html" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>직원 목록</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-sitemap"></i>
+            <span>부서 관리</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">근태 관리</div>
+          <a href="attendance.html" class="nav-item">
+            <i class="fas fa-clock"></i>
+            <span>근태 현황</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-calendar-alt"></i>
+            <span>휴가 신청</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-clipboard-check"></i>
+            <span>승인 관리</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">건강 관리</div>
+          <a href="health.html" class="nav-item active">
+            <i class="fas fa-heartbeat"></i>
+            <span>건강 현황</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-poll"></i>
+            <span>스트레스 설문</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-spa"></i>
+            <span>건강 프로그램</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">기타</div>
+          <a href="#" class="nav-item">
+            <i class="fas fa-bullhorn"></i>
+            <span>게시판</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-file-alt"></i>
+            <span>리포트</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>설정</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+      <!-- 헤더 -->
+      <header class="header">
+        <div class="header-left">
+          <div class="breadcrumb">
+            <a href="#">홈</a>
+            <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+            <a href="#">건강 관리</a>
+            <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+            <span class="current">건강 현황</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <button class="header-icon-btn">
+            <i class="fas fa-search"></i>
+          </button>
+          <button class="header-icon-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-profile">
+            <div class="user-avatar">김</div>
+            <div class="user-info">
+              <div class="user-name">김민수</div>
+              <div class="user-role">객실 승무원</div>
+            </div>
+            <i class="fas fa-chevron-down" style="color: var(--gray-400); font-size: 0.75rem;"></i>
+          </div>
+        </div>
+      </header>
+
+      <!-- 페이지 컨텐츠 -->
+      <div class="page-content">
+        <!-- 건강 점수 히어로 -->
+        <div class="health-hero">
+          <div class="health-hero-content">
+            <div class="health-hero-left">
+              <h2>안녕하세요, 김민수님!</h2>
+              <p>현재 건강 상태는 양호합니다. 지속적인 관리로 건강을 유지하세요.</p>
+              <div style="margin-top: 20px; display: flex; gap: 12px;">
+                <button class="btn" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">
+                  <i class="fas fa-file-medical"></i> 상세 리포트
+                </button>
+                <button class="btn" style="background: var(--white); color: var(--primary-blue);">
+                  <i class="fas fa-poll"></i> 설문 참여하기
+                </button>
+              </div>
+            </div>
+            <div class="health-score-circle">
+              <div class="score-value">82</div>
+              <div class="score-label">건강 점수</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 건강 지표 카드 -->
+        <div class="health-metrics">
+          <div class="metric-card fatigue">
+            <div class="metric-header">
+              <div class="metric-icon">
+                <i class="fas fa-battery-three-quarters"></i>
+              </div>
+              <div class="metric-grade">A</div>
+            </div>
+            <div class="metric-title">피로도</div>
+            <div class="metric-desc">최근 7일 기준 피로 지수</div>
+            <div class="metric-progress">
+              <div class="metric-progress-bar">
+                <div class="metric-progress-fill" style="width: 25%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-card stress">
+            <div class="metric-header">
+              <div class="metric-icon">
+                <i class="fas fa-brain"></i>
+              </div>
+              <div class="metric-grade">B+</div>
+            </div>
+            <div class="metric-title">스트레스</div>
+            <div class="metric-desc">최근 설문 기반 스트레스 지수</div>
+            <div class="metric-progress">
+              <div class="metric-progress-bar">
+                <div class="metric-progress-fill" style="width: 45%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-card jetlag">
+            <div class="metric-header">
+              <div class="metric-icon">
+                <i class="fas fa-globe-americas"></i>
+              </div>
+              <div class="metric-grade">B</div>
+            </div>
+            <div class="metric-title">시차 영향</div>
+            <div class="metric-desc">최근 비행 기반 시차 적응도</div>
+            <div class="metric-progress">
+              <div class="metric-progress-bar">
+                <div class="metric-progress-fill" style="width: 55%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-card workload">
+            <div class="metric-header">
+              <div class="metric-icon">
+                <i class="fas fa-tasks"></i>
+              </div>
+              <div class="metric-grade">C+</div>
+            </div>
+            <div class="metric-title">업무 강도</div>
+            <div class="metric-desc">최근 30일 근무 패턴 분석</div>
+            <div class="metric-progress">
+              <div class="metric-progress-bar">
+                <div class="metric-progress-fill" style="width: 68%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 설문 안내 배너 -->
+        <div class="survey-card">
+          <div class="survey-icon">
+            <i class="fas fa-clipboard-list"></i>
+          </div>
+          <div class="survey-content">
+            <h3>1월 스트레스 설문에 참여해주세요</h3>
+            <p>마지막 참여일: 2025-12-15 · 다음 설문 마감: 2026-01-20</p>
+          </div>
+          <button class="survey-btn">
+            <i class="fas fa-arrow-right"></i> 설문 참여
+          </button>
+        </div>
+
+        <div class="health-grid">
+          <!-- 왼쪽: 차트 및 프로그램 -->
+          <div>
+            <!-- 건강 추이 차트 -->
+            <div class="chart-container mb-4">
+              <div class="chart-header">
+                <h3 style="font-size: 1rem; font-weight: 600;">
+                  <i class="fas fa-chart-line" style="color: var(--primary-blue); margin-right: 8px;"></i>
+                  건강 점수 추이
+                </h3>
+                <div class="tabs">
+                  <button class="tab active">7일</button>
+                  <button class="tab">30일</button>
+                  <button class="tab">90일</button>
+                </div>
+              </div>
+              <div class="chart-placeholder">
+                <div style="text-align: center;">
+                  <i class="fas fa-chart-area" style="font-size: 3rem; margin-bottom: 12px;"></i>
+                  <p>건강 점수 추이 차트 영역</p>
+                  <p style="font-size: 0.75rem; margin-top: 4px;">실제 구현 시 Chart.js 등을 사용하여 시각화</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 건강 프로그램 -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-spa" style="color: var(--success); margin-right: 8px;"></i>
+                  추천 건강 프로그램
+                </h3>
+                <a href="#" class="btn btn-sm btn-secondary">전체보기</a>
+              </div>
+              <div class="card-body">
+                <div class="program-grid">
+                  <div class="program-card">
+                    <div class="program-image counseling">
+                      <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="program-content">
+                      <div class="program-title">1:1 심리 상담</div>
+                      <div class="program-desc">전문 상담사와 함께하는 맞춤형 심리 케어</div>
+                      <div class="program-meta">
+                        <span><i class="fas fa-clock"></i> 50분</span>
+                        <span><i class="fas fa-users"></i> 12/20명</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="program-card">
+                    <div class="program-image exercise">
+                      <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <div class="program-content">
+                      <div class="program-title">스트레칭 클래스</div>
+                      <div class="program-desc">비행 후 피로 회복을 위한 요가 & 스트레칭</div>
+                      <div class="program-meta">
+                        <span><i class="fas fa-clock"></i> 60분</span>
+                        <span><i class="fas fa-users"></i> 8/15명</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="program-card">
+                    <div class="program-image rest">
+                      <i class="fas fa-bed"></i>
+                    </div>
+                    <div class="program-content">
+                      <div class="program-title">수면 개선 프로그램</div>
+                      <div class="program-desc">시차 적응과 수면 품질 향상 코칭</div>
+                      <div class="program-meta">
+                        <span><i class="fas fa-calendar"></i> 4주</span>
+                        <span><i class="fas fa-users"></i> 5/10명</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 오른쪽: 건강 팁 및 기록 -->
+          <div>
+            <!-- 나의 건강 기록 요약 -->
+            <div class="card mb-4">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-history" style="color: var(--primary-blue); margin-right: 8px;"></i>
+                  최근 기록
+                </h3>
+              </div>
+              <div class="card-body" style="padding: 16px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                  <div style="text-align: center; padding: 16px; background: var(--gray-50); border-radius: var(--border-radius);">
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-blue);">847h</div>
+                    <div style="font-size: 0.75rem; color: var(--gray-500);">누적 비행시간</div>
+                  </div>
+                  <div style="text-align: center; padding: 16px; background: var(--gray-50); border-radius: var(--border-radius);">
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">12회</div>
+                    <div style="font-size: 0.75rem; color: var(--gray-500);">설문 참여</div>
+                  </div>
+                  <div style="text-align: center; padding: 16px; background: var(--gray-50); border-radius: var(--border-radius);">
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--warning);">3회</div>
+                    <div style="font-size: 0.75rem; color: var(--gray-500);">프로그램 참여</div>
+                  </div>
+                  <div style="text-align: center; padding: 16px; background: var(--gray-50); border-radius: var(--border-radius);">
+                    <div style="font-size: 1.5rem; font-weight: 700; color: #8b5cf6;">+5점</div>
+                    <div style="font-size: 0.75rem; color: var(--gray-500);">점수 변화</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 건강 팁 -->
+            <div class="health-tips">
+              <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px;">
+                <i class="fas fa-lightbulb" style="color: var(--warning); margin-right: 8px;"></i>
+                맞춤 건강 팁
+              </h3>
+              <div class="tip-item">
+                <div class="tip-icon">
+                  <i class="fas fa-tint"></i>
+                </div>
+                <div class="tip-content">
+                  <h4>수분 섭취</h4>
+                  <p>장거리 비행 후에는 탈수를 방지하기 위해 물을 충분히 섭취하세요.</p>
+                </div>
+              </div>
+              <div class="tip-item">
+                <div class="tip-icon">
+                  <i class="fas fa-moon"></i>
+                </div>
+                <div class="tip-content">
+                  <h4>시차 적응</h4>
+                  <p>도착지 시간에 맞춰 수면 패턴을 조정하면 시차 적응에 도움됩니다.</p>
+                </div>
+              </div>
+              <div class="tip-item">
+                <div class="tip-icon">
+                  <i class="fas fa-walking"></i>
+                </div>
+                <div class="tip-content">
+                  <h4>가벼운 운동</h4>
+                  <p>비행 후 가벼운 스트레칭이나 산책으로 혈액 순환을 촉진하세요.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 부서별 건강 현황 (관리자용) -->
+        <div class="department-health">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="fas fa-users" style="color: var(--primary-blue); margin-right: 8px;"></i>
+                부서별 건강 현황 (관리자)
+              </h3>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-sm btn-secondary">
+                  <i class="fas fa-download"></i> 리포트
+                </button>
+              </div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <div class="dept-health-row" style="background: var(--gray-50); font-weight: 600; font-size: 0.8rem; color: var(--gray-500);">
+                <div class="dept-name">부서</div>
+                <div class="dept-score">평균 점수</div>
+                <div class="dept-progress">점수 분포</div>
+                <div class="dept-stats">
+                  <div class="dept-stat" style="width: 60px;">인원</div>
+                  <div class="dept-stat" style="width: 60px;">참여율</div>
+                  <div class="dept-stat" style="width: 60px;">상태</div>
+                </div>
+              </div>
+              <div class="dept-health-row">
+                <div class="dept-name">객실 승무원</div>
+                <div class="dept-score">
+                  <div class="dept-score-value" style="color: var(--success);">84</div>
+                </div>
+                <div class="dept-progress">
+                  <div class="progress">
+                    <div class="progress-bar green" style="width: 84%;"></div>
+                  </div>
+                </div>
+                <div class="dept-stats">
+                  <div class="dept-stat" style="width: 60px;">
+                    <div class="dept-stat-value">1,245</div>
+                    <div class="dept-stat-label">명</div>
+                  </div>
+                  <div class="dept-stat" style="width: 60px;">
+                    <div class="dept-stat-value">92%</div>
+                    <div class="dept-stat-label">참여</div>
+                  </div>
+                  <div class="dept-stat" style="width: 60px;">
+                    <span class="badge badge-success">양호</span>
+                  </div>
+                </div>
+              </div>
+              <div class="dept-health-row">
+                <div class="dept-name">운항 승무원</div>
+                <div class="dept-score">
+                  <div class="dept-score-value" style="color: var(--warning);">76</div>
+                </div>
+                <div class="dept-progress">
+                  <div class="progress">
+                    <div class="progress-bar yellow" style="width: 76%;"></div>
+                  </div>
+                </div>
+                <div class="dept-stats">
+                  <div class="dept-stat" style="width: 60px;">
+                    <div class="dept-stat-value">432</div>
+                    <div class="dept-stat-label">명</div>
+                  </div>
+                  <div class="dept-stat" style="width: 60px;">
+                    <div class="dept-stat-value">88%</div>
+                    <div class="dept-stat-label">참여</div>
+                  </div>
+                  <div class="dept-stat" style="width: 60px;">
+                    <span class="badge badge-warning">주의</span>
+                  </div>
+                </div>
+              </div>
+              <div class="dept-health-row">
+                <div class="dept-name">지상직</div>
+                <div class="dept-score">
+                  <div class="dept-score-value" style="color: var(--success);">81</div>
+                </div>
+                <div class="dept-progress">
+                  <div class="progress">
+                    <div class="progress-bar green" style="width: 81%;"></div>
+                  </div>
+                </div>
+                <div class="dept-stats">
+                  <div class="dept-stat" style="width: 60px;">
+                    <div class="dept-stat-value">678</div>
+                    <div class="dept-stat-label">명</div>
+                  </div>
+                  <div class="dept-stat" style="width: 60px;">
+                    <div class="dept-stat-value">95%</div>
+                    <div class="dept-stat-label">참여</div>
+                  </div>
+                  <div class="dept-stat" style="width: 60px;">
+                    <span class="badge badge-success">양호</span>
+                  </div>
+                </div>
+              </div>
+              <div class="dept-health-row">
+                <div class="dept-name">정비팀</div>
+                <div class="dept-score">
+                  <div class="dept-score-value" style="color: var(--error);">68</div>
+                </div>
+                <div class="dept-progress">
+                  <div class="progress">
+                    <div class="progress-bar red" style="width: 68%;"></div>
+                  </div>
+                </div>
+                <div class="dept-stats">
+                  <div class="dept-stat" style="width: 60px;">
+                    <div class="dept-stat-value">289</div>
+                    <div class="dept-stat-label">명</div>
+                  </div>
+                  <div class="dept-stat" style="width: 60px;">
+                    <div class="dept-stat-value">78%</div>
+                    <div class="dept-stat-label">참여</div>
+                  </div>
+                  <div class="dept-stat" style="width: 60px;">
+                    <span class="badge badge-danger">관리필요</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
+

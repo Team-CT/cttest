@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 50">
+  <!-- Korean Air Taegeuk Symbol -->
+  <g transform="translate(10, 5)">
+    <!-- Outer circle -->
+    <circle cx="20" cy="20" r="18" fill="none" stroke="#0F1E5B" stroke-width="2"/>
+    <!-- Taegeuk pattern -->
+    <path d="M20 2 A18 18 0 0 1 20 38 A9 9 0 0 1 20 20 A9 9 0 0 0 20 2" fill="#0F1E5B"/>
+    <path d="M20 38 A18 18 0 0 1 20 2 A9 9 0 0 1 20 20 A9 9 0 0 0 20 38" fill="#C8102E"/>
+  </g>
+  
+  <!-- KOREAN AIR Text -->
+  <text x="55" y="32" font-family="'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="500" fill="#0F1E5B" letter-spacing="2">
+    KOREAN AIR
+  </text>
+</svg>

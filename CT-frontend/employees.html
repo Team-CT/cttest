@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>직원 관리 - SkyHR | 대한항공 HR 시스템</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* 직원 관리 전용 스타일 */
+    .filter-bar {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 300px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px 16px 12px 44px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--border-radius);
+      font-size: 0.9rem;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-400);
+    }
+
+    .filter-select {
+      padding: 12px 16px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--border-radius);
+      min-width: 150px;
+      font-size: 0.9rem;
+      color: var(--gray-700);
+      cursor: pointer;
+    }
+
+    .employee-table-container {
+      background: var(--white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .table-title {
+      font-size: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .table-title span {
+      color: var(--primary-blue);
+      font-size: 0.85rem;
+    }
+
+    .employee-row {
+      display: flex;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--gray-100);
+      transition: background var(--transition-fast);
+    }
+
+    .employee-row:hover {
+      background: var(--gray-50);
+    }
+
+    .employee-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .employee-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .employee-name {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .employee-id {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+    }
+
+    .employee-col {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .employee-col-label {
+      font-size: 0.7rem;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .employee-col-value {
+      font-size: 0.875rem;
+      color: var(--gray-700);
+    }
+
+    .employee-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--gray-300);
+      background: var(--white);
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-500);
+      transition: all var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .action-btn:hover {
+      background: var(--primary-blue);
+      border-color: var(--primary-blue);
+      color: var(--white);
+    }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 20px;
+      border-top: 1px solid var(--gray-200);
+    }
+
+    .pagination-btn {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--gray-300);
+      background: var(--white);
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-600);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .pagination-btn:hover,
+    .pagination-btn.active {
+      background: var(--primary-blue);
+      border-color: var(--primary-blue);
+      color: var(--white);
+    }
+
+    .department-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .dept-tab {
+      padding: 10px 20px;
+      background: var(--white);
+      border: 1px solid var(--gray-300);
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--gray-600);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .dept-tab:hover {
+      border-color: var(--primary-blue);
+      color: var(--primary-blue);
+    }
+
+    .dept-tab.active {
+      background: var(--primary-blue);
+      border-color: var(--primary-blue);
+      color: var(--white);
+    }
+
+    .dept-tab span {
+      margin-left: 6px;
+      padding: 2px 8px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      font-size: 0.75rem;
+    }
+
+    .dept-tab:not(.active) span {
+      background: var(--gray-200);
+    }
+
+    /* 반응형 */
+    @media (max-width: 1024px) {
+      .employee-row {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .employee-col {
+        min-width: 100px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .filter-bar {
+        flex-direction: column;
+      }
+
+      .search-box {
+        min-width: 100%;
+      }
+
+      .employee-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .employee-col {
+        width: 50%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-plane" style="font-size: 1.5rem;"></i>
+          <div>
+            <h1>SkyHR</h1>
+            <span>Korean Air HR System</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">메인</div>
+          <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>대시보드</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">직원 관리</div>
+          <a href="employees.html" class="nav-item active">
+            <i class="fas fa-users"></i>
+            <span>직원 목록</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-sitemap"></i>
+            <span>부서 관리</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">근태 관리</div>
+          <a href="attendance.html" class="nav-item">
+            <i class="fas fa-clock"></i>
+            <span>근태 현황</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-calendar-alt"></i>
+            <span>휴가 신청</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-clipboard-check"></i>
+            <span>승인 관리</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">건강 관리</div>
+          <a href="health.html" class="nav-item">
+            <i class="fas fa-heartbeat"></i>
+            <span>건강 현황</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-poll"></i>
+            <span>스트레스 설문</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-spa"></i>
+            <span>건강 프로그램</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">기타</div>
+          <a href="#" class="nav-item">
+            <i class="fas fa-bullhorn"></i>
+            <span>게시판</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-file-alt"></i>
+            <span>리포트</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>설정</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+      <!-- 헤더 -->
+      <header class="header">
+        <div class="header-left">
+          <div class="breadcrumb">
+            <a href="#">홈</a>
+            <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+            <a href="#">직원 관리</a>
+            <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+            <span class="current">직원 목록</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <button class="header-icon-btn">
+            <i class="fas fa-search"></i>
+          </button>
+          <button class="header-icon-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-profile">
+            <div class="user-avatar">관</div>
+            <div class="user-info">
+              <div class="user-name">관리자</div>
+              <div class="user-role">인사팀</div>
+            </div>
+            <i class="fas fa-chevron-down" style="color: var(--gray-400); font-size: 0.75rem;"></i>
+          </div>
+        </div>
+      </header>
+
+      <!-- 페이지 컨텐츠 -->
+      <div class="page-content">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">직원 관리</h1>
+            <p class="page-subtitle">전체 직원 정보를 조회하고 관리할 수 있습니다</p>
+          </div>
+          <button class="btn btn-primary">
+            <i class="fas fa-plus"></i> 직원 등록
+          </button>
+        </div>
+
+        <!-- 부서 탭 -->
+        <div class="department-tabs">
+          <button class="dept-tab active">전체 <span>2,847</span></button>
+          <button class="dept-tab">객실 승무원 <span>1,245</span></button>
+          <button class="dept-tab">기장/부기장 <span>432</span></button>
+          <button class="dept-tab">지상직 <span>678</span></button>
+          <button class="dept-tab">정비사 <span>289</span></button>
+          <button class="dept-tab">관리직 <span>203</span></button>
+        </div>
+
+        <!-- 필터 바 -->
+        <div class="filter-bar">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="이름, 사번, 이메일로 검색...">
+          </div>
+          <select class="filter-select">
+            <option value="">직급 선택</option>
+            <option value="captain">기장</option>
+            <option value="first_officer">부기장</option>
+            <option value="purser">사무장</option>
+            <option value="senior_crew">선임 승무원</option>
+            <option value="crew">승무원</option>
+          </select>
+          <select class="filter-select">
+            <option value="">상태 선택</option>
+            <option value="active">재직</option>
+            <option value="vacation">휴가</option>
+            <option value="training">교육</option>
+            <option value="leave">휴직</option>
+          </select>
+          <button class="btn btn-secondary">
+            <i class="fas fa-filter"></i> 상세 필터
+          </button>
+        </div>
+
+        <!-- 직원 테이블 -->
+        <div class="employee-table-container">
+          <div class="table-header">
+            <div class="table-title">
+              직원 목록 <span>(총 2,847명)</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-sm btn-secondary">
+                <i class="fas fa-download"></i> 엑셀 다운로드
+              </button>
+            </div>
+          </div>
+
+          <!-- 직원 목록 -->
+          <div class="employee-row">
+            <div class="employee-info">
+              <div class="employee-avatar">김</div>
+              <div>
+                <div class="employee-name">김민수</div>
+                <div class="employee-id">EMP-2024-0847</div>
+              </div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">부서</div>
+              <div class="employee-col-value">객실 승무원</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">직급</div>
+              <div class="employee-col-value">선임 승무원</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">입사일</div>
+              <div class="employee-col-value">2019-03-15</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">상태</div>
+              <span class="badge badge-success">재직</span>
+            </div>
+            <div class="employee-actions">
+              <button class="action-btn" title="상세보기">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn" title="수정">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="action-btn" title="더보기">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="employee-row">
+            <div class="employee-info">
+              <div class="employee-avatar" style="background: linear-gradient(135deg, #e63946 0%, #f77f00 100%);">박</div>
+              <div>
+                <div class="employee-name">박지현</div>
+                <div class="employee-id">EMP-2020-1234</div>
+              </div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">부서</div>
+              <div class="employee-col-value">운항 승무원</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">직급</div>
+              <div class="employee-col-value">기장</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">입사일</div>
+              <div class="employee-col-value">2010-07-22</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">상태</div>
+              <span class="badge badge-success">재직</span>
+            </div>
+            <div class="employee-actions">
+              <button class="action-btn" title="상세보기">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn" title="수정">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="action-btn" title="더보기">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="employee-row">
+            <div class="employee-info">
+              <div class="employee-avatar" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%);">이</div>
+              <div>
+                <div class="employee-name">이수진</div>
+                <div class="employee-id">EMP-2022-0562</div>
+              </div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">부서</div>
+              <div class="employee-col-value">객실 승무원</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">직급</div>
+              <div class="employee-col-value">승무원</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">입사일</div>
+              <div class="employee-col-value">2022-01-10</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">상태</div>
+              <span class="badge badge-warning">휴가</span>
+            </div>
+            <div class="employee-actions">
+              <button class="action-btn" title="상세보기">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn" title="수정">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="action-btn" title="더보기">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="employee-row">
+            <div class="employee-info">
+              <div class="employee-avatar" style="background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);">최</div>
+              <div>
+                <div class="employee-name">최영호</div>
+                <div class="employee-id">EMP-2018-0291</div>
+              </div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">부서</div>
+              <div class="employee-col-value">정비팀</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">직급</div>
+              <div class="employee-col-value">선임 정비사</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">입사일</div>
+              <div class="employee-col-value">2018-05-03</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">상태</div>
+              <span class="badge badge-success">재직</span>
+            </div>
+            <div class="employee-actions">
+              <button class="action-btn" title="상세보기">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn" title="수정">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="action-btn" title="더보기">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="employee-row">
+            <div class="employee-info">
+              <div class="employee-avatar" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);">정</div>
+              <div>
+                <div class="employee-name">정하나</div>
+                <div class="employee-id">EMP-2021-0788</div>
+              </div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">부서</div>
+              <div class="employee-col-value">지상직</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">직급</div>
+              <div class="employee-col-value">게이트 매니저</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">입사일</div>
+              <div class="employee-col-value">2021-09-01</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">상태</div>
+              <span class="badge badge-primary">교육</span>
+            </div>
+            <div class="employee-actions">
+              <button class="action-btn" title="상세보기">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn" title="수정">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="action-btn" title="더보기">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="employee-row">
+            <div class="employee-info">
+              <div class="employee-avatar" style="background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);">한</div>
+              <div>
+                <div class="employee-name">한소희</div>
+                <div class="employee-id">EMP-2023-0156</div>
+              </div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">부서</div>
+              <div class="employee-col-value">객실 승무원</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">직급</div>
+              <div class="employee-col-value">사무장</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">입사일</div>
+              <div class="employee-col-value">2015-02-20</div>
+            </div>
+            <div class="employee-col">
+              <div class="employee-col-label">상태</div>
+              <span class="badge badge-success">재직</span>
+            </div>
+            <div class="employee-actions">
+              <button class="action-btn" title="상세보기">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn" title="수정">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="action-btn" title="더보기">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 페이지네이션 -->
+          <div class="pagination">
+            <button class="pagination-btn">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn">3</button>
+            <button class="pagination-btn">4</button>
+            <button class="pagination-btn">5</button>
+            <span style="color: var(--gray-400);">...</span>
+            <button class="pagination-btn">142</button>
+            <button class="pagination-btn">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
+

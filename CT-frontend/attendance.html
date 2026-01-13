@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>근태 관리 - SkyHR | 대한항공 HR 시스템</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* 근태 관리 전용 스타일 */
+    .attendance-overview {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .overview-card {
+      background: var(--white);
+      border-radius: var(--border-radius-lg);
+      padding: 20px;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+    }
+
+    .overview-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    .overview-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .overview-label {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+
+    .calendar-section {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .calendar-card {
+      background: var(--white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-md);
+    }
+
+    .calendar-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .calendar-nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .calendar-nav button {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--gray-300);
+      background: var(--white);
+      border-radius: var(--border-radius);
+      color: var(--gray-600);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .calendar-nav button:hover {
+      background: var(--primary-blue);
+      border-color: var(--primary-blue);
+      color: var(--white);
+    }
+
+    .calendar-month {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .calendar-body {
+      padding: 20px;
+    }
+
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      margin-bottom: 8px;
+    }
+
+    .weekday {
+      text-align: center;
+      padding: 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+    }
+
+    .weekday:first-child {
+      color: var(--error);
+    }
+
+    .weekday:last-child {
+      color: var(--primary-blue);
+    }
+
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      padding: 8px;
+      border-radius: var(--border-radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+      position: relative;
+    }
+
+    .calendar-day:hover {
+      background: var(--gray-100);
+    }
+
+    .calendar-day.today {
+      background: var(--primary-blue);
+      color: var(--white);
+    }
+
+    .calendar-day.other-month {
+      color: var(--gray-300);
+    }
+
+    .day-number {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .day-indicator {
+      display: flex;
+      gap: 2px;
+      margin-top: 4px;
+    }
+
+    .indicator-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .indicator-dot.work { background: var(--success); }
+    .indicator-dot.vacation { background: var(--warning); }
+    .indicator-dot.half { background: var(--info); }
+    .indicator-dot.flight { background: var(--primary-blue); }
+
+    .leave-request-panel {
+      background: var(--white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-md);
+    }
+
+    .panel-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .panel-title {
+      font-size: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-body {
+      padding: 20px;
+    }
+
+    .leave-type-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .leave-type-btn {
+      padding: 16px;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--border-radius);
+      background: var(--white);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .leave-type-btn:hover {
+      border-color: var(--primary-blue);
+    }
+
+    .leave-type-btn.selected {
+      border-color: var(--primary-blue);
+      background: var(--sky-blue-light);
+    }
+
+    .leave-type-btn i {
+      font-size: 1.5rem;
+      color: var(--primary-blue);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .leave-type-btn span {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--gray-700);
+    }
+
+    .pending-requests {
+      margin-top: 24px;
+    }
+
+    .request-item {
+      display: flex;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--border-radius);
+      margin-bottom: 10px;
+      transition: background var(--transition-fast);
+    }
+
+    .request-item:hover {
+      background: var(--gray-50);
+    }
+
+    .request-type-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 14px;
+      font-size: 1rem;
+    }
+
+    .request-info {
+      flex: 1;
+    }
+
+    .request-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
+
+    .request-date {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+    }
+
+    /* 근무 유형 테이블 */
+    .work-type-legend {
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+      background: var(--gray-50);
+      border-radius: var(--border-radius);
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--gray-600);
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* 승인 대기 테이블 */
+    .approval-table {
+      margin-top: 32px;
+    }
+
+    .approval-row {
+      display: flex;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .approval-row:hover {
+      background: var(--gray-50);
+    }
+
+    .approver-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .approval-details {
+      flex: 2;
+    }
+
+    .approval-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* 반응형 */
+    @media (max-width: 1200px) {
+      .attendance-overview {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .calendar-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .attendance-overview {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .leave-type-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-plane" style="font-size: 1.5rem;"></i>
+          <div>
+            <h1>SkyHR</h1>
+            <span>Korean Air HR System</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">메인</div>
+          <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>대시보드</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">직원 관리</div>
+          <a href="employees.html" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>직원 목록</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-sitemap"></i>
+            <span>부서 관리</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">근태 관리</div>
+          <a href="attendance.html" class="nav-item active">
+            <i class="fas fa-clock"></i>
+            <span>근태 현황</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-calendar-alt"></i>
+            <span>휴가 신청</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-clipboard-check"></i>
+            <span>승인 관리</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">건강 관리</div>
+          <a href="health.html" class="nav-item">
+            <i class="fas fa-heartbeat"></i>
+            <span>건강 현황</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-poll"></i>
+            <span>스트레스 설문</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-spa"></i>
+            <span>건강 프로그램</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">기타</div>
+          <a href="#" class="nav-item">
+            <i class="fas fa-bullhorn"></i>
+            <span>게시판</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-file-alt"></i>
+            <span>리포트</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>설정</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+      <!-- 헤더 -->
+      <header class="header">
+        <div class="header-left">
+          <div class="breadcrumb">
+            <a href="#">홈</a>
+            <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+            <a href="#">근태 관리</a>
+            <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+            <span class="current">근태 현황</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <button class="header-icon-btn">
+            <i class="fas fa-search"></i>
+          </button>
+          <button class="header-icon-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-profile">
+            <div class="user-avatar">김</div>
+            <div class="user-info">
+              <div class="user-name">김민수</div>
+              <div class="user-role">객실 승무원</div>
+            </div>
+            <i class="fas fa-chevron-down" style="color: var(--gray-400); font-size: 0.75rem;"></i>
+          </div>
+        </div>
+      </header>
+
+      <!-- 페이지 컨텐츠 -->
+      <div class="page-content">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">근태 관리</h1>
+            <p class="page-subtitle">나의 근태 현황과 일정을 확인하고 휴가를 신청할 수 있습니다</p>
+          </div>
+          <button class="btn btn-primary">
+            <i class="fas fa-plus"></i> 휴가 신청
+          </button>
+        </div>
+
+        <!-- 근태 현황 요약 -->
+        <div class="attendance-overview">
+          <div class="overview-card">
+            <div class="overview-icon" style="background: #d1fae5; color: var(--success);">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="overview-value">18</div>
+            <div class="overview-label">이번 달 출근일</div>
+          </div>
+          <div class="overview-card">
+            <div class="overview-icon" style="background: var(--sky-blue-light); color: var(--primary-blue);">
+              <i class="fas fa-plane"></i>
+            </div>
+            <div class="overview-value">62h</div>
+            <div class="overview-label">이번 달 비행시간</div>
+          </div>
+          <div class="overview-card">
+            <div class="overview-icon" style="background: #fef3c7; color: var(--warning);">
+              <i class="fas fa-sun"></i>
+            </div>
+            <div class="overview-value">3</div>
+            <div class="overview-label">사용 연차</div>
+          </div>
+          <div class="overview-card">
+            <div class="overview-icon" style="background: #fce7f3; color: #ec4899;">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="overview-value">1</div>
+            <div class="overview-label">반차 사용</div>
+          </div>
+          <div class="overview-card">
+            <div class="overview-icon" style="background: #ede9fe; color: #8b5cf6;">
+              <i class="fas fa-laptop-house"></i>
+            </div>
+            <div class="overview-value">2</div>
+            <div class="overview-label">워케이션</div>
+          </div>
+        </div>
+
+        <!-- 캘린더 섹션 -->
+        <div class="calendar-section">
+          <!-- 캘린더 -->
+          <div class="calendar-card">
+            <div class="calendar-header">
+              <div class="calendar-nav">
+                <button><i class="fas fa-chevron-left"></i></button>
+                <span class="calendar-month">2026년 1월</span>
+                <button><i class="fas fa-chevron-right"></i></button>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-sm btn-secondary">오늘</button>
+                <button class="btn btn-sm btn-secondary">
+                  <i class="fas fa-list"></i> 목록 보기
+                </button>
+              </div>
+            </div>
+            <div class="calendar-body">
+              <div class="calendar-weekdays">
+                <div class="weekday">일</div>
+                <div class="weekday">월</div>
+                <div class="weekday">화</div>
+                <div class="weekday">수</div>
+                <div class="weekday">목</div>
+                <div class="weekday">금</div>
+                <div class="weekday">토</div>
+              </div>
+              <div class="calendar-days">
+                <!-- 이전 달 -->
+                <div class="calendar-day other-month"><span class="day-number">29</span></div>
+                <div class="calendar-day other-month"><span class="day-number">30</span></div>
+                <div class="calendar-day other-month"><span class="day-number">31</span></div>
+                <!-- 1월 -->
+                <div class="calendar-day">
+                  <span class="day-number">1</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot vacation"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">2</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot work"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">3</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot flight"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">4</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot flight"></span>
+                  </div>
+                </div>
+                <!-- 2주차 -->
+                <div class="calendar-day"><span class="day-number">5</span></div>
+                <div class="calendar-day">
+                  <span class="day-number">6</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot work"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">7</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot work"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">8</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot half"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">9</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot flight"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">10</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot flight"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">11</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot work"></span>
+                  </div>
+                </div>
+                <!-- 3주차 -->
+                <div class="calendar-day">
+                  <span class="day-number">12</span>
+                </div>
+                <div class="calendar-day today">
+                  <span class="day-number">13</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot" style="background: white;"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">14</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot work"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">15</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot flight"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">16</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot flight"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">17</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot work"></span>
+                  </div>
+                </div>
+                <div class="calendar-day"><span class="day-number">18</span></div>
+                <!-- 4주차 -->
+                <div class="calendar-day"><span class="day-number">19</span></div>
+                <div class="calendar-day">
+                  <span class="day-number">20</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot vacation"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">21</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot vacation"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">22</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot work"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">23</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot work"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">24</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot flight"></span>
+                  </div>
+                </div>
+                <div class="calendar-day"><span class="day-number">25</span></div>
+                <!-- 5주차 -->
+                <div class="calendar-day"><span class="day-number">26</span></div>
+                <div class="calendar-day">
+                  <span class="day-number">27</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot work"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">28</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot work"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">29</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot work"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">30</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot flight"></span>
+                  </div>
+                </div>
+                <div class="calendar-day">
+                  <span class="day-number">31</span>
+                  <div class="day-indicator">
+                    <span class="indicator-dot flight"></span>
+                  </div>
+                </div>
+                <div class="calendar-day other-month"><span class="day-number">1</span></div>
+              </div>
+
+              <!-- 범례 -->
+              <div class="work-type-legend">
+                <div class="legend-item">
+                  <span class="legend-dot" style="background: var(--success);"></span>
+                  출근
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot" style="background: var(--primary-blue);"></span>
+                  비행 근무
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot" style="background: var(--warning);"></span>
+                  휴가
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot" style="background: var(--info);"></span>
+                  반차
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot" style="background: #8b5cf6;"></span>
+                  워케이션
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 휴가 신청 패널 -->
+          <div class="leave-request-panel">
+            <div class="panel-header">
+              <h3 class="panel-title">
+                <i class="fas fa-calendar-plus" style="color: var(--primary-blue);"></i>
+                빠른 휴가 신청
+              </h3>
+            </div>
+            <div class="panel-body">
+              <div class="leave-type-grid">
+                <button class="leave-type-btn selected">
+                  <i class="fas fa-sun"></i>
+                  <span>연차</span>
+                </button>
+                <button class="leave-type-btn">
+                  <i class="fas fa-clock"></i>
+                  <span>반차</span>
+                </button>
+                <button class="leave-type-btn">
+                  <i class="fas fa-calendar-day"></i>
+                  <span>월차</span>
+                </button>
+                <button class="leave-type-btn">
+                  <i class="fas fa-laptop-house"></i>
+                  <span>워케이션</span>
+                </button>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">시작일</label>
+                <input type="date" class="form-input" value="2026-01-20">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">종료일</label>
+                <input type="date" class="form-input" value="2026-01-21">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">사유</label>
+                <textarea class="form-input" rows="3" placeholder="휴가 사유를 입력하세요"></textarea>
+              </div>
+
+              <button class="btn btn-primary" style="width: 100%;">
+                <i class="fas fa-paper-plane"></i> 휴가 신청하기
+              </button>
+
+              <!-- 대기 중인 신청 -->
+              <div class="pending-requests">
+                <h4 style="font-size: 0.9rem; margin-bottom: 12px; color: var(--gray-700);">
+                  <i class="fas fa-hourglass-half" style="color: var(--warning); margin-right: 6px;"></i>
+                  대기 중인 신청
+                </h4>
+                <div class="request-item">
+                  <div class="request-type-icon" style="background: #fef3c7; color: var(--warning);">
+                    <i class="fas fa-sun"></i>
+                  </div>
+                  <div class="request-info">
+                    <div class="request-title">연차 2일</div>
+                    <div class="request-date">1/20 - 1/21</div>
+                  </div>
+                  <span class="badge badge-warning">대기중</span>
+                </div>
+                <div class="request-item">
+                  <div class="request-type-icon" style="background: #ede9fe; color: #8b5cf6;">
+                    <i class="fas fa-laptop-house"></i>
+                  </div>
+                  <div class="request-info">
+                    <div class="request-title">워케이션</div>
+                    <div class="request-date">2/1 - 2/5</div>
+                  </div>
+                  <span class="badge badge-warning">대기중</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 승인 관리 (관리자용) -->
+        <div class="card mt-4">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="fas fa-clipboard-check" style="color: var(--success); margin-right: 8px;"></i>
+              휴가 승인 대기 목록 (관리자)
+            </h3>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-sm btn-success">전체 승인</button>
+              <button class="btn btn-sm btn-secondary">필터</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="approval-row">
+              <div class="approver-info">
+                <div class="employee-avatar" style="width: 40px; height: 40px; font-size: 0.85rem;">이</div>
+                <div>
+                  <div style="font-weight: 600; font-size: 0.9rem;">이수진</div>
+                  <div style="font-size: 0.8rem; color: var(--gray-500);">객실 승무원</div>
+                </div>
+              </div>
+              <div class="approval-details">
+                <span class="badge badge-warning" style="margin-right: 8px;">연차</span>
+                <span style="font-size: 0.9rem;">2026-01-25 ~ 2026-01-27 (3일)</span>
+                <p style="font-size: 0.8rem; color: var(--gray-500); margin-top: 4px;">개인 사유</p>
+              </div>
+              <div class="approval-actions">
+                <button class="btn btn-sm btn-success"><i class="fas fa-check"></i> 승인</button>
+                <button class="btn btn-sm btn-danger"><i class="fas fa-times"></i> 반려</button>
+              </div>
+            </div>
+            <div class="approval-row">
+              <div class="approver-info">
+                <div class="employee-avatar" style="width: 40px; height: 40px; font-size: 0.85rem; background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);">정</div>
+                <div>
+                  <div style="font-weight: 600; font-size: 0.9rem;">정하나</div>
+                  <div style="font-size: 0.8rem; color: var(--gray-500);">지상직</div>
+                </div>
+              </div>
+              <div class="approval-details">
+                <span class="badge badge-primary" style="margin-right: 8px;">반차</span>
+                <span style="font-size: 0.9rem;">2026-01-22 오전</span>
+                <p style="font-size: 0.8rem; color: var(--gray-500); margin-top: 4px;">병원 방문</p>
+              </div>
+              <div class="approval-actions">
+                <button class="btn btn-sm btn-success"><i class="fas fa-check"></i> 승인</button>
+                <button class="btn btn-sm btn-danger"><i class="fas fa-times"></i> 반려</button>
+              </div>
+            </div>
+            <div class="approval-row">
+              <div class="approver-info">
+                <div class="employee-avatar" style="width: 40px; height: 40px; font-size: 0.85rem; background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);">최</div>
+                <div>
+                  <div style="font-weight: 600; font-size: 0.9rem;">최영호</div>
+                  <div style="font-size: 0.8rem; color: var(--gray-500);">정비사</div>
+                </div>
+              </div>
+              <div class="approval-details">
+                <span class="badge" style="background: #ede9fe; color: #8b5cf6; margin-right: 8px;">워케이션</span>
+                <span style="font-size: 0.9rem;">2026-02-03 ~ 2026-02-07 (5일)</span>
+                <p style="font-size: 0.8rem; color: var(--gray-500); margin-top: 4px;">제주 워케이션 프로그램 참여</p>
+              </div>
+              <div class="approval-actions">
+                <button class="btn btn-sm btn-success"><i class="fas fa-check"></i> 승인</button>
+                <button class="btn btn-sm btn-danger"><i class="fas fa-times"></i> 반려</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
+
