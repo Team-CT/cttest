@@ -241,6 +241,95 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
+
+    /* 필터링 관련 스타일 */
+    .post-item[data-category="notice"] { display: flex; }
+    .post-item[data-category="general"] { display: flex; }
+    .post-item[data-category="event"] { display: flex; }
+    .post-item[data-category="qna"] { display: flex; }
+
+    .post-item.hidden {
+      display: none !important;
+    }
+
+    /* 글쓰기 모달 스타일 */
+    .write-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition-normal);
+    }
+
+    .write-modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .write-modal {
+      background: var(--white);
+      border-radius: var(--border-radius-lg);
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: scale(0.9);
+      transition: transform var(--transition-normal);
+    }
+
+    .write-modal-overlay.active .write-modal {
+      transform: scale(1);
+    }
+
+    .write-modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .write-modal-header h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gray-800);
+    }
+
+    .write-modal-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: var(--gray-100);
+      border-radius: 50%;
+      color: var(--gray-500);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .write-modal-close:hover {
+      background: var(--gray-200);
+      color: var(--gray-700);
+    }
+
+    .write-modal-body {
+      padding: 24px;
+    }
+
+    .write-modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
   </style>
 </head>
 <body>
@@ -359,7 +448,7 @@
           <!-- 게시판 헤더 -->
           <div class="board-header">
             <h1 class="board-title"><i class="fas fa-bullhorn"></i> 게시판</h1>
-            <button class="btn btn-primary">
+            <button class="btn btn-primary" onclick="openWriteModal()">
               <i class="fas fa-plus"></i> 글쓰기
             </button>
           </div>
@@ -389,7 +478,7 @@
           <!-- 게시글 목록 -->
           <div class="post-list">
             <!-- 공지사항 -->
-            <div class="post-item">
+            <div class="post-item" data-category="notice" onclick="window.location.href='board_detail.html'">
               <span class="post-category notice">공지</span>
               <div class="post-content">
                 <div class="post-title has-new">2026년 건강검진 일정 안내</div>
@@ -413,7 +502,7 @@
               </div>
             </div>
 
-            <div class="post-item">
+            <div class="post-item" data-category="notice">
               <span class="post-category notice">공지</span>
               <div class="post-content">
                 <div class="post-title">신규 승무원 교육 프로그램 안내</div>
@@ -438,7 +527,7 @@
             </div>
 
             <!-- 일반 게시글 -->
-            <div class="post-item">
+            <div class="post-item" data-category="general">
               <span class="post-category">일반</span>
               <div class="post-content">
                 <div class="post-title has-new">비행 일정 변경 관련 문의드립니다</div>
@@ -462,7 +551,7 @@
               </div>
             </div>
 
-            <div class="post-item">
+            <div class="post-item" data-category="event">
               <span class="post-category event">이벤트</span>
               <div class="post-content">
                 <div class="post-title">건강 프로그램 참여 이벤트 안내</div>
@@ -486,7 +575,7 @@
               </div>
             </div>
 
-            <div class="post-item">
+            <div class="post-item" data-category="general">
               <span class="post-category">일반</span>
               <div class="post-content">
                 <div class="post-title">시차 적응 팁 공유합니다</div>
@@ -510,7 +599,7 @@
               </div>
             </div>
 
-            <div class="post-item">
+            <div class="post-item" data-category="general">
               <span class="post-category">일반</span>
               <div class="post-content">
                 <div class="post-title">휴가 신청 관련 문의</div>
@@ -534,7 +623,7 @@
               </div>
             </div>
 
-            <div class="post-item">
+            <div class="post-item" data-category="general">
               <span class="post-category">일반</span>
               <div class="post-content">
                 <div class="post-title">승무원 복지 프로그램 추천합니다</div>
@@ -558,7 +647,7 @@
               </div>
             </div>
 
-            <div class="post-item">
+            <div class="post-item" data-category="general">
               <span class="post-category">일반</span>
               <div class="post-content">
                 <div class="post-title">비행 중 건강 관리 방법</div>
@@ -602,22 +691,99 @@
     </main>
   </div>
 
+  <!-- 글쓰기 모달 -->
+  <div class="write-modal-overlay" id="writeModal">
+    <div class="write-modal">
+      <div class="write-modal-header">
+        <h3><i class="fas fa-edit"></i> 새 글 작성</h3>
+        <button class="write-modal-close" onclick="closeWriteModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="write-modal-body">
+        <div class="form-group">
+          <label class="form-label">카테고리</label>
+          <select class="form-select">
+            <option>일반게시판</option>
+            <option>공지사항</option>
+            <option>이벤트</option>
+            <option>Q&A</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">제목</label>
+          <input type="text" class="form-input" placeholder="제목을 입력하세요">
+        </div>
+        <div class="form-group">
+          <label class="form-label">내용</label>
+          <textarea class="form-textarea" rows="15" placeholder="내용을 입력하세요..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">첨부파일</label>
+          <input type="file" class="form-input" multiple>
+          <small style="color: var(--gray-500); font-size: 0.75rem; margin-top: 4px; display: block;">최대 5개 파일, 각 10MB 이하</small>
+        </div>
+      </div>
+      <div class="write-modal-footer">
+        <button class="btn btn-secondary" onclick="closeWriteModal()">
+          <i class="fas fa-times"></i> 취소
+        </button>
+        <button class="btn btn-primary">
+          <i class="fas fa-paper-plane"></i> 등록하기
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // 탭 전환 기능
+    // 탭 필터링 기능
     document.querySelectorAll('.board-tab').forEach(tab => {
       tab.addEventListener('click', function() {
+        const category = this.getAttribute('data-tab');
+        
+        // 탭 활성화
         document.querySelectorAll('.board-tab').forEach(t => t.classList.remove('active'));
         this.classList.add('active');
-        // 여기에 실제 필터링 로직 추가 가능
+        
+        // 게시글 필터링
+        document.querySelectorAll('.post-item').forEach(item => {
+          const itemCategory = item.getAttribute('data-category');
+          
+          if (category === 'all') {
+            item.classList.remove('hidden');
+          } else if (itemCategory === category) {
+            item.classList.remove('hidden');
+          } else {
+            item.classList.add('hidden');
+          }
+        });
       });
     });
 
-    // 게시글 클릭 이벤트
-    document.querySelectorAll('.post-item').forEach(item => {
-      item.addEventListener('click', function() {
-        // 게시글 상세 페이지로 이동하는 로직 추가 가능
-        console.log('게시글 클릭됨');
-      });
+    // 글쓰기 모달 열기
+    function openWriteModal() {
+      document.getElementById('writeModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // 글쓰기 모달 닫기
+    function closeWriteModal() {
+      document.getElementById('writeModal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // 모달 외부 클릭 시 닫기
+    document.getElementById('writeModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeWriteModal();
+      }
+    });
+
+    // ESC 키로 모달 닫기
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeWriteModal();
+      }
     });
   </script>
 </body>
