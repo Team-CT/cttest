@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>건강 프로그램 - SkyHR | 대한항공 HR 시스템</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .program-header-card {
+      background: linear-gradient(135deg, #4a90c2 0%, #6bb3e0 100%);
+      border-radius: var(--border-radius-lg);
+      padding: 30px;
+      color: white;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .program-header-card h1 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .program-header-card p {
+      opacity: 0.9;
+      font-size: 0.9rem;
+    }
+
+    .btn-apply {
+      background: white;
+      color: #4a90c2;
+      border: none;
+      padding: 14px 28px;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-apply:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .program-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .program-card {
+      background: var(--white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .program-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .program-image {
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: white;
+    }
+
+    .program-counseling .program-image {
+      background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+    }
+
+    .program-exercise .program-image {
+      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    }
+
+    .program-rest .program-image {
+      background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    }
+
+    .program-content {
+      padding: 20px;
+    }
+
+    .program-content h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: var(--gray-800);
+    }
+
+    .program-content p {
+      font-size: 0.85rem;
+      color: var(--gray-500);
+      line-height: 1.5;
+    }
+
+    .program-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--gray-100);
+    }
+
+    .program-meta span {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+    }
+
+    .program-meta .available {
+      color: #10b981;
+      font-weight: 500;
+    }
+
+    .my-applications {
+      background: var(--white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .section-header h2 {
+      font-size: 1.1rem;
+      color: var(--gray-800);
+    }
+
+    .application-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .application-table th,
+    .application-table td {
+      padding: 16px 24px;
+      text-align: left;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .application-table th {
+      background: var(--gray-50);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gray-600);
+    }
+
+    .application-table td {
+      font-size: 0.9rem;
+      color: var(--gray-700);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .status-approved {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .status-completed {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .btn-action {
+      padding: 8px 16px;
+      border-radius: var(--border-radius);
+      font-size: 0.8rem;
+      cursor: pointer;
+      background: var(--gray-100);
+      border: none;
+      color: var(--gray-600);
+    }
+
+    .btn-action:hover {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    /* 모달 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: var(--border-radius-lg);
+      width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      font-size: 1.25rem;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--gray-400);
+      cursor: pointer;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--border-radius);
+      font-size: 0.9rem;
+    }
+
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .modal-footer {
+      padding: 24px;
+      border-top: 1px solid var(--gray-100);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .btn-modal {
+      padding: 12px 24px;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn-cancel {
+      background: var(--gray-100);
+      border: none;
+      color: var(--gray-600);
+    }
+
+    .btn-submit {
+      background: linear-gradient(135deg, #4a90c2 0%, #6bb3e0 100%);
+      border: none;
+      color: white;
+    }
+
+    @media (max-width: 1024px) {
+      .program-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .program-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-plane" style="font-size: 1.5rem;"></i>
+          <div>
+            <h1>SkyHR</h1>
+            <span>Korean Air HR System</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">메인</div>
+          <a href="/dashboard" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>대시보드</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">직원 관리</div>
+          <a href="/employees" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>직원 목록</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-sitemap"></i>
+            <span>부서 관리</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">근태 관리</div>
+          <a href="/attendance" class="nav-item">
+            <i class="fas fa-clock"></i>
+            <span>근태 현황</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-calendar-alt"></i>
+            <span>휴가 신청</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-clipboard-check"></i>
+            <span>승인 관리</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">건강 관리</div>
+          <a href="/health" class="nav-item">
+            <i class="fas fa-heartbeat"></i>
+            <span>건강 현황</span>
+          </a>
+          <a href="/stress-survey" class="nav-item">
+            <i class="fas fa-poll"></i>
+            <span>스트레스 설문</span>
+          </a>
+          <a href="/health-program" class="nav-item active">
+            <i class="fas fa-spa"></i>
+            <span>건강 프로그램</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">기타</div>
+          <a href="#" class="nav-item">
+            <i class="fas fa-bullhorn"></i>
+            <span>게시판</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-file-alt"></i>
+            <span>리포트</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>설정</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+      <!-- 헤더 -->
+      <header class="header">
+        <div class="header-left">
+          <div class="breadcrumb">
+            <a href="#">홈</a>
+            <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+            <a href="/health">건강 관리</a>
+            <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+            <span class="current">건강 프로그램</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <button class="header-icon-btn">
+            <i class="fas fa-search"></i>
+          </button>
+          <button class="header-icon-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-profile">
+            <div class="user-avatar">김</div>
+            <div class="user-info">
+              <div class="user-name">김민수</div>
+              <div class="user-role">객실 승무원</div>
+            </div>
+            <i class="fas fa-chevron-down" style="color: var(--gray-400); font-size: 0.75rem;"></i>
+          </div>
+        </div>
+      </header>
+
+      <!-- 페이지 컨텐츠 -->
+      <div class="page-content">
+        <!-- 헤더 카드 -->
+        <div class="program-header-card">
+          <div>
+            <h1><i class="fas fa-spa"></i> 건강 프로그램</h1>
+            <p>직원 건강 증진을 위한 다양한 프로그램에 참여하세요</p>
+          </div>
+          <button class="btn-apply" onclick="openModal()">
+            <i class="fas fa-plus"></i> 프로그램 신청
+          </button>
+        </div>
+
+        <!-- 프로그램 카드 -->
+        <div class="program-grid">
+          <div class="program-card program-counseling">
+            <div class="program-image">
+              <i class="fas fa-comments"></i>
+            </div>
+            <div class="program-content">
+              <h3>심리 상담 프로그램</h3>
+              <p>전문 상담사와 1:1 상담을 통해 스트레스 관리 및 심리적 안정을 도모합니다.</p>
+              <div class="program-meta">
+                <span><i class="fas fa-clock"></i> 50분 / 회</span>
+                <span class="available"><i class="fas fa-check-circle"></i> 신청 가능</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="program-card program-exercise">
+            <div class="program-image">
+              <i class="fas fa-running"></i>
+            </div>
+            <div class="program-content">
+              <h3>운동 프로그램</h3>
+              <p>체력 증진 및 건강 관리를 위한 맞춤형 운동 프로그램입니다.</p>
+              <div class="program-meta">
+                <span><i class="fas fa-calendar"></i> 주 2회</span>
+                <span class="available"><i class="fas fa-check-circle"></i> 신청 가능</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="program-card program-rest">
+            <div class="program-image">
+              <i class="fas fa-bed"></i>
+            </div>
+            <div class="program-content">
+              <h3>휴식 프로그램</h3>
+              <p>명상, 요가 등을 통한 심신 안정 및 회복 프로그램입니다.</p>
+              <div class="program-meta">
+                <span><i class="fas fa-leaf"></i> 힐링 캠프</span>
+                <span class="available"><i class="fas fa-check-circle"></i> 신청 가능</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 내 신청 내역 -->
+        <div class="my-applications">
+          <div class="section-header">
+            <h2><i class="fas fa-list-alt"></i> 내 신청 내역</h2>
+          </div>
+          <table class="application-table">
+            <thead>
+              <tr>
+                <th>신청일</th>
+                <th>프로그램</th>
+                <th>신청 사유</th>
+                <th>상태</th>
+                <th>액션</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2026-01-10</td>
+                <td>심리 상담</td>
+                <td>업무 스트레스로 인한 상담 요청</td>
+                <td><span class="status-badge status-approved">승인</span></td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td>2026-01-08</td>
+                <td>운동 프로그램</td>
+                <td>체력 증진 목적</td>
+                <td><span class="status-badge status-completed">완료</span></td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td>2026-01-12</td>
+                <td>휴식 프로그램</td>
+                <td>장거리 비행 후 피로 회복</td>
+                <td><span class="status-badge status-pending">대기중</span></td>
+                <td><button class="btn-action">취소</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 신청 모달 -->
+  <div class="modal-overlay" id="applyModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-file-medical"></i> 건강 프로그램 신청</h2>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>프로그램 유형 *</label>
+          <select>
+            <option value="">프로그램을 선택하세요</option>
+            <option value="counseling">심리 상담 프로그램</option>
+            <option value="exercise">운동 프로그램</option>
+            <option value="rest">휴식 프로그램</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>신청 사유 *</label>
+          <textarea placeholder="프로그램 신청 사유를 입력해주세요."></textarea>
+        </div>
+        <div class="form-group">
+          <label>희망 일정</label>
+          <select>
+            <option value="">희망하는 일정을 선택하세요</option>
+            <option value="asap">가능한 빠른 시일</option>
+            <option value="week1">1주 이내</option>
+            <option value="week2">2주 이내</option>
+            <option value="month1">1개월 이내</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal btn-cancel" onclick="closeModal()">취소</button>
+        <button class="btn-modal btn-submit">신청하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openModal() {
+      document.getElementById('applyModal').style.display = 'flex';
+    }
+    function closeModal() {
+      document.getElementById('applyModal').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
