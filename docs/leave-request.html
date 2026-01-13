@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>휴가 신청 - SkyHR | 대한항공 HR 시스템</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #0066cc;
+      --sky-blue-light: #e6f2ff;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --info: #3b82f6;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --white: #ffffff;
+      --border-radius: 8px;
+      --border-radius-lg: 12px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --transition-fast: 150ms;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+    }
+
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 256px;
+      background: var(--white);
+      border-right: 1px solid var(--gray-200);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar-logo i {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+    }
+
+    .sidebar-logo h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .sidebar-logo span {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      display: block;
+      margin-top: -2px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .nav-section {
+      margin-bottom: 24px;
+    }
+
+    .nav-section-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      padding: 0 12px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--border-radius);
+      color: var(--gray-700);
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      margin-bottom: 4px;
+    }
+
+    .nav-item:hover {
+      background: var(--gray-50);
+    }
+
+    .nav-item.active {
+      background: var(--sky-blue-light);
+      color: var(--primary-blue);
+    }
+
+    .nav-item i {
+      width: 20px;
+      font-size: 1.1rem;
+    }
+
+    .nav-item span {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 16px 32px;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+    }
+
+    .breadcrumb a {
+      color: var(--gray-600);
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+      color: var(--gray-900);
+    }
+
+    .breadcrumb .current {
+      color: var(--gray-900);
+      font-weight: 500;
+    }
+
+    .breadcrumb i {
+      color: var(--gray-400);
+      font-size: 0.7rem;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-icon-btn {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: transparent;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+
+    .header-icon-btn:hover {
+      background: var(--gray-100);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 20px;
+      height: 20px;
+      background: var(--error);
+      color: var(--white);
+      font-size: 0.75rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      border-left: 1px solid var(--gray-200);
+      padding-left: 16px;
+      cursor: pointer;
+      border-radius: var(--border-radius);
+      transition: background var(--transition-fast);
+    }
+
+    .user-profile:hover {
+      background: var(--gray-50);
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .user-info {
+      text-align: left;
+    }
+
+    .user-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .user-role {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    /* Page Content */
+    .page-content {
+      flex: 1;
+      padding: 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-title {
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+      color: var(--gray-600);
+    }
+
+    /* Grid Layout */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .left-column {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Card */
+    .card {
+      background: var(--white);
+      border-radius: var(--border-radius-lg);
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .card-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 24px;
+    }
+
+    /* Leave Type Selection */
+    .leave-type-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .leave-type-btn {
+      position: relative;
+      padding: 16px;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--border-radius-lg);
+      background: var(--white);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-align: center;
+    }
+
+    .leave-type-btn:hover {
+      border-color: var(--gray-300);
+    }
+
+    .leave-type-btn.selected {
+      border-color: var(--primary-blue);
+      background: var(--sky-blue-light);
+    }
+
+    .leave-type-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--white);
+    }
+
+    .leave-type-icon.annual {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    }
+
+    .leave-type-icon.half {
+      background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
+    }
+
+    .leave-type-icon.monthly {
+      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    }
+
+    .leave-type-icon.workation {
+      background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+    }
+
+    .leave-type-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 4px;
+    }
+
+    .leave-type-remaining {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    .check-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 20px;
+      height: 20px;
+      background: var(--primary-blue);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-size: 0.75rem;
+    }
+
+    /* Form */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: 8px;
+    }
+
+    .form-label .required {
+      color: var(--error);
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 10px 16px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--border-radius);
+      font-size: 0.875rem;
+      transition: all var(--transition-fast);
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    }
+
+    .form-textarea {
+      resize: none;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+
+    .input-icon {
+      position: relative;
+    }
+
+    .input-icon i {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-400);
+      pointer-events: none;
+    }
+
+    /* Time Selection */
+    .time-selection {
+      display: flex;
+      gap: 12px;
+    }
+
+    .time-btn {
+      flex: 1;
+      padding: 10px 16px;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--border-radius);
+      background: var(--white);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .time-btn:hover {
+      border-color: var(--gray-300);
+    }
+
+    .time-btn.selected {
+      border-color: var(--primary-blue);
+      background: var(--sky-blue-light);
+      color: var(--primary-blue);
+    }
+
+    /* File Upload */
+    .file-upload {
+      border: 2px dashed var(--gray-300);
+      border-radius: var(--border-radius);
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition-fast);
+    }
+
+    .file-upload:hover {
+      border-color: var(--primary-blue);
+    }
+
+    .file-upload i {
+      font-size: 2rem;
+      color: var(--gray-400);
+      margin-bottom: 8px;
+    }
+
+    .file-upload-text {
+      font-size: 0.875rem;
+      color: var(--gray-600);
+      margin-bottom: 4px;
+    }
+
+    .file-upload-hint {
+      font-size: 0.75rem;
+      color: var(--gray-400);
+    }
+
+    /* Notice */
+    .notice {
+      background: var(--sky-blue-light);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--border-radius);
+      padding: 16px;
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .notice i {
+      color: var(--primary-blue);
+      font-size: 1.25rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .notice-content {
+      font-size: 0.875rem;
+      color: #1e40af;
+    }
+
+    .notice-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .notice-list {
+      list-style: none;
+      margin-top: 8px;
+    }
+
+    .notice-list li {
+      margin-bottom: 4px;
+      color: #1d4ed8;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--primary-blue);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: #0052a3;
+    }
+
+    .btn-secondary {
+      background: var(--gray-100);
+      color: var(--gray-700);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-200);
+    }
+
+    .btn-full {
+      width: 100%;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      padding-top: 16px;
+    }
+
+    .btn-group .btn {
+      flex: 1;
+    }
+
+    /* Stats Card */
+    .stats-card {
+      background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+      border-radius: var(--border-radius);
+      padding: 16px;
+      color: var(--white);
+    }
+
+    .stats-label {
+      font-size: 0.875rem;
+      opacity: 0.9;
+      margin-bottom: 4px;
+    }
+
+    .stats-value {
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .stats-hint {
+      font-size: 0.75rem;
+      opacity: 0.8;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .stats-item {
+      text-align: center;
+      padding: 12px;
+      border-radius: var(--border-radius);
+    }
+
+    .stats-item.green {
+      background: #d1fae5;
+    }
+
+    .stats-item.orange {
+      background: #fed7aa;
+    }
+
+    .stats-item.gray {
+      background: var(--gray-100);
+    }
+
+    .stats-item-label {
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      margin-bottom: 4px;
+    }
+
+    .stats-item-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .stats-item-value.green {
+      color: var(--success);
+    }
+
+    .stats-item-value.orange {
+      color: var(--warning);
+    }
+
+    .stats-item-value.gray {
+      color: var(--gray-600);
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      margin-top: 16px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--gray-200);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    /* Pending Requests */
+    .pending-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .badge.orange {
+      background: #fed7aa;
+      color: #9a3412;
+    }
+
+    .pending-item {
+      padding: 16px;
+      border: 1px solid #fed7aa;
+      background: #fffbeb;
+      border-radius: var(--border-radius);
+      margin-bottom: 12px;
+    }
+
+    .pending-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .pending-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .type-badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .type-badge.annual {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .type-badge.workation {
+      background: #ede9fe;
+      color: #6b21a8;
+    }
+
+    .pending-status {
+      font-size: 0.75rem;
+      color: var(--warning);
+      font-weight: 500;
+    }
+
+    .pending-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 4px;
+    }
+
+    .pending-date {
+      font-size: 0.75rem;
+      color: var(--gray-600);
+    }
+
+    /* History */
+    .history-item {
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--gray-100);
+      margin-bottom: 12px;
+    }
+
+    .history-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      color: var(--success);
+    }
+
+    .status-badge i {
+      font-size: 0.75rem;
+    }
+
+    .history-period {
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      margin-bottom: 2px;
+    }
+
+    .history-days {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .leave-type-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .page-content {
+        padding: 16px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Hidden class */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-plane"></i>
+          <div>
+            <h1>SkyHR</h1>
+            <span>Korean Air HR System</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">메인</div>
+          <a href="#" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>대시보드</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">직원 관리</div>
+          <a href="#" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>직원 목록</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-sitemap"></i>
+            <span>부서 관리</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">근태 관리</div>
+          <a href="#" class="nav-item">
+            <i class="fas fa-clock"></i>
+            <span>근태 현황</span>
+          </a>
+          <a href="#" class="nav-item active">
+            <i class="fas fa-calendar-alt"></i>
+            <span>휴가 신청</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-clipboard-check"></i>
+            <span>승인 관리</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">건강 관리</div>
+          <a href="#" class="nav-item">
+            <i class="fas fa-heartbeat"></i>
+            <span>건강 현황</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-poll"></i>
+            <span>스트레스 설문</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-spa"></i>
+            <span>건강 프로그램</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">기타</div>
+          <a href="#" class="nav-item">
+            <i class="fas fa-bullhorn"></i>
+            <span>게시판</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-file-alt"></i>
+            <span>리포트</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>설정</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+      <!-- 헤더 -->
+      <header class="header">
+        <div class="header-content">
+          <div class="breadcrumb">
+            <a href="#">홈</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="#">근태 관리</a>
+            <i class="fas fa-chevron-right"></i>
+            <span class="current">휴가 신청</span>
+          </div>
+          <div class="header-right">
+            <button class="header-icon-btn">
+              <i class="fas fa-search"></i>
+            </button>
+            <button class="header-icon-btn">
+              <i class="fas fa-bell"></i>
+              <span class="notification-badge">3</span>
+            </button>
+            <div class="user-profile">
+              <div class="user-avatar">김</div>
+              <div class="user-info">
+                <div class="user-name">김민수</div>
+                <div class="user-role">객실 승무원</div>
+              </div>
+              <i class="fas fa-chevron-down" style="color: var(--gray-400); font-size: 0.75rem;"></i>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- 페이지 컨텐츠 -->
+      <div class="page-content">
+        <div class="page-header">
+          <h1 class="page-title">휴가 신청</h1>
+          <p class="page-subtitle">원하는 휴가 유형을 선택하고 신청서를 제출하세요</p>
+        </div>
+
+        <div class="content-grid">
+          <!-- 왼쪽 컬럼 - 신청 폼 -->
+          <div class="left-column">
+            <!-- 휴가 유형 선택 -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">휴가 유형 선택</h2>
+              </div>
+              <div class="card-body">
+                <div class="leave-type-grid">
+                  <button class="leave-type-btn selected" data-type="annual">
+                    <div class="leave-type-icon annual">
+                      <i class="fas fa-sun"></i>
+                    </div>
+                    <div class="leave-type-label">연차</div>
+                    <div class="leave-type-remaining">잔여 12일</div>
+                    <span class="check-badge">
+                      <i class="fas fa-check"></i>
+                    </span>
+                  </button>
+                  <button class="leave-type-btn" data-type="half">
+                    <div class="leave-type-icon half">
+                      <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="leave-type-label">반차</div>
+                    <div class="leave-type-remaining">잔여 8일</div>
+                  </button>
+                  <button class="leave-type-btn" data-type="monthly">
+                    <div class="leave-type-icon monthly">
+                      <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="leave-type-label">월차</div>
+                    <div class="leave-type-remaining">잔여 2일</div>
+                  </button>
+                  <button class="leave-type-btn" data-type="workation">
+                    <div class="leave-type-icon workation">
+                      <i class="fas fa-laptop-house"></i>
+                    </div>
+                    <div class="leave-type-label">워케이션</div>
+                    <div class="leave-type-remaining">잔여 3일</div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 신청 정보 -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">신청 정보</h2>
+              </div>
+              <div class="card-body">
+                <form id="leaveRequestForm">
+                  <!-- 날짜 선택 -->
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label">
+                        시작일 <span class="required">*</span>
+                      </label>
+                      <div class="input-icon">
+                        <input type="date" class="form-input" value="2026-01-20" required>
+                        <i class="fas fa-calendar"></i>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">
+                        종료일 <span class="required">*</span>
+                      </label>
+                      <div class="input-icon">
+                        <input type="date" class="form-input" value="2026-01-21" required>
+                        <i class="fas fa-calendar"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 반차 시간 선택 (반차 선택 시만 표시) -->
+                  <div class="form-group hidden" id="halfDayOptions">
+                    <label class="form-label">시간 선택</label>
+                    <div class="time-selection">
+                      <button type="button" class="time-btn selected">
+                        오전 (09:00 - 13:00)
+                      </button>
+                      <button type="button" class="time-btn">
+                        오후 (13:00 - 18:00)
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- 업무 대리자 -->
+                  <div class="form-group">
+                    <label class="form-label">업무 대리자</label>
+                    <select class="form-select">
+                      <option value="">대리자를 선택하세요</option>
+                      <option value="이수진">이수진 - 객실 승무원</option>
+                      <option value="박지영">박지영 - 객실 승무원</option>
+                      <option value="최민호">최민호 - 객실 승무원</option>
+                      <option value="정하나">정하나 - 지상직</option>
+                    </select>
+                  </div>
+
+                  <!-- 휴가 사유 -->
+                  <div class="form-group">
+                    <label class="form-label">
+                      휴가 사유 <span class="required">*</span>
+                    </label>
+                    <textarea class="form-textarea" rows="4" placeholder="휴가 사유를 상세히 입력해주세요" required></textarea>
+                  </div>
+
+                  <!-- 첨부파일 -->
+                  <div class="form-group">
+                    <label class="form-label">첨부파일</label>
+                    <div class="file-upload">
+                      <i class="fas fa-cloud-upload-alt"></i>
+                      <p class="file-upload-text">파일을 드래그하거나 클릭하여 업로드</p>
+                      <p class="file-upload-hint">PDF, JPG, PNG (최대 10MB)</p>
+                    </div>
+                  </div>
+
+                  <!-- 안내사항 -->
+                  <div class="notice">
+                    <i class="fas fa-info-circle"></i>
+                    <div class="notice-content">
+                      <div class="notice-title">휴가 신청 시 유의사항</div>
+                      <ul class="notice-list">
+                        <li>• 휴가는 최소 3일 전에 신청해주세요</li>
+                        <li>• 비행 스케줄이 있는 경우 사전에 조율이 필요합니다</li>
+                        <li>• 승인 후에는 취소가 어려우니 신중히 신청해주세요</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <!-- 버튼 -->
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-secondary">취소</button>
+                    <button type="submit" class="btn btn-primary">
+                      <i class="fas fa-paper-plane"></i>
+                      휴가 신청하기
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- 오른쪽 컬럼 - 통계 & 내역 -->
+          <div class="right-column">
+            <!-- 연차 사용 현황 -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">연차 사용 현황</h2>
+              </div>
+              <div class="card-body">
+                <div class="stats-card">
+                  <div class="stats-label">총 연차</div>
+                  <div class="stats-value">15일</div>
+                  <div class="stats-hint">2026년 기준</div>
+                </div>
+
+                <div class="stats-grid">
+                  <div class="stats-item green">
+                    <div class="stats-item-label">잔여</div>
+                    <div class="stats-item-value green">12일</div>
+                  </div>
+                  <div class="stats-item orange">
+                    <div class="stats-item-label">사용</div>
+                    <div class="stats-item-value orange">3일</div>
+                  </div>
+                  <div class="stats-item gray">
+                    <div class="stats-item-label">소멸예정</div>
+                    <div class="stats-item-value gray">0일</div>
+                  </div>
+                </div>
+
+                <div class="progress-container">
+                  <div class="progress-header">
+                    <span>사용률</span>
+                    <span>20%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: 20%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 대기 중인 신청 -->
+            <div class="card">
+              <div class="card-body">
+                <div class="pending-header">
+                  <h2 class="card-title">대기 중인 신청</h2>
+                  <span class="badge orange">2건</span>
+                </div>
+
+                <div class="pending-item">
+                  <div class="pending-header-row">
+                    <span class="type-badge annual">연차</span>
+                    <span class="pending-status">대기중</span>
+                  </div>
+                  <div class="pending-title">2일</div>
+                  <div class="pending-date">1/20 - 1/21</div>
+                </div>
+
+                <div class="pending-item">
+                  <div class="pending-header-row">
+                    <span class="type-badge workation">워케이션</span>
+                    <span class="pending-status">대기중</span>
+                  </div>
+                  <div class="pending-title">5일</div>
+                  <div class="pending-date">2/1 - 2/5</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 최근 신청 내역 -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">최근 신청 내역</h2>
+              </div>
+              <div class="card-body">
+                <div class="history-item">
+                  <div class="history-header">
+                    <span class="type-badge annual">연차</span>
+                    <span class="status-badge">
+                      <i class="fas fa-check"></i>
+                      승인됨
+                    </span>
+                  </div>
+                  <div class="history-period">2025-12-24 ~ 2025-12-27</div>
+                  <div class="history-days">4일 사용</div>
+                </div>
+
+                <div class="history-item">
+                  <div class="history-header">
+                    <span class="type-badge" style="background: #fce7f3; color: #9f1239;">반차</span>
+                    <span class="status-badge">
+                      <i class="fas fa-check"></i>
+                      승인됨
+                    </span>
+                  </div>
+                  <div class="history-period">2025-11-15 오전</div>
+                  <div class="history-days">0.5일 사용</div>
+                </div>
+
+                <div class="history-item">
+                  <div class="history-header">
+                    <span class="type-badge workation">워케이션</span>
+                    <span class="status-badge">
+                      <i class="fas fa-check"></i>
+                      승인됨
+                    </span>
+                  </div>
+                  <div class="history-period">2025-10-10 ~ 2025-10-14</div>
+                  <div class="history-days">5일 사용</div>
+                </div>
+
+                <div class="history-item">
+                  <div class="history-header">
+                    <span class="type-badge annual">연차</span>
+                    <span class="status-badge">
+                      <i class="fas fa-check"></i>
+                      승인됨
+                    </span>
+                  </div>
+                  <div class="history-period">2025-09-05 ~ 2025-09-06</div>
+                  <div class="history-days">2일 사용</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // 휴가 유형 선택
+    const leaveTypeBtns = document.querySelectorAll('.leave-type-btn');
+    const halfDayOptions = document.getElementById('halfDayOptions');
+
+    leaveTypeBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        leaveTypeBtns.forEach(b => {
+          b.classList.remove('selected');
+          const badge = b.querySelector('.check-badge');
+          if (badge) badge.remove();
+        });
+        
+        this.classList.add('selected');
+        
+        const checkBadge = document.createElement('span');
+        checkBadge.className = 'check-badge';
+        checkBadge.innerHTML = '<i class="fas fa-check"></i>';
+        this.appendChild(checkBadge);
+
+        // 반차 선택 시 시간 선택 옵션 표시
+        if (this.dataset.type === 'half') {
+          halfDayOptions.classList.remove('hidden');
+        } else {
+          halfDayOptions.classList.add('hidden');
+        }
+      });
+    });
+
+    // 시간 선택 버튼
+    const timeBtns = document.querySelectorAll('.time-btn');
+    timeBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        timeBtns.forEach(b => b.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+
+    // 폼 제출
+    document.getElementById('leaveRequestForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('휴가 신청이 접수되었습니다!');
+    });
+
+    // 파일 업로드
+    const fileUpload = document.querySelector('.file-upload');
+    fileUpload.addEventListener('click', function() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.pdf,.jpg,.jpeg,.png';
+      input.click();
+      
+      input.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+          const fileName = e.target.files[0].name;
+          fileUpload.querySelector('.file-upload-text').textContent = fileName;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
