@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로그인 - SkyHR | 대한항공 HR 시스템</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #4a90c2 0%, #5da5d5 50%, #6bb3e0 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 배경 애니메이션 - 비행기 패턴 */
+    .bg-pattern {
+      position: absolute;
+      inset: 0;
+      opacity: 0.05;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z'/%3E%3C/svg%3E");
+      background-size: 60px;
+    }
+
+    /* 구름 효과 */
+    .clouds {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .cloud {
+      position: absolute;
+      background: white;
+      border-radius: 100px;
+      opacity: 0.03;
+      animation: float 30s infinite linear;
+    }
+
+    .cloud::before,
+    .cloud::after {
+      content: '';
+      position: absolute;
+      background: inherit;
+      border-radius: inherit;
+    }
+
+    .cloud:nth-child(1) {
+      width: 200px;
+      height: 60px;
+      top: 10%;
+      left: -200px;
+      animation-delay: 0s;
+    }
+
+    .cloud:nth-child(2) {
+      width: 300px;
+      height: 80px;
+      top: 30%;
+      left: -300px;
+      animation-delay: -10s;
+      animation-duration: 40s;
+    }
+
+    .cloud:nth-child(3) {
+      width: 150px;
+      height: 50px;
+      top: 60%;
+      left: -150px;
+      animation-delay: -20s;
+      animation-duration: 35s;
+    }
+
+    @keyframes float {
+      from { transform: translateX(0); }
+      to { transform: translateX(calc(100vw + 300px)); }
+    }
+
+    /* 로그인 컨테이너 */
+    .login-container {
+      display: flex;
+      width: 900px;
+      max-width: 95%;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+      animation: slideUp 0.6s ease-out;
+    }
+
+    /* 왼쪽 브랜드 섹션 */
+    .login-brand {
+      width: 45%;
+      background: linear-gradient(135deg, #4a90c2 0%, #5da5d5 100%);
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-brand::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .brand-logo i {
+      font-size: 2.5rem;
+      color: white;
+    }
+
+    .korean-air-logo {
+      height: 50px;
+      width: auto;
+      filter: brightness(0) invert(1);
+    }
+
+    .brand-logo-text h1 {
+      font-size: 1.8rem;
+      color: white;
+      font-weight: 700;
+    }
+
+    .brand-logo-text span {
+      font-size: 0.85rem;
+      color: #87CEEB;
+    }
+
+    .brand-description {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1rem;
+      line-height: 1.8;
+      position: relative;
+    }
+
+    .brand-features {
+      margin-top: 40px;
+      position: relative;
+    }
+
+    .brand-feature {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+    }
+
+    .brand-feature i {
+      width: 24px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: #C4A35A;
+    }
+
+    /* 오른쪽 로그인 폼 */
+    .login-form-section {
+      width: 55%;
+      padding: 50px 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .login-header {
+      margin-bottom: 35px;
+    }
+
+    .login-header h2 {
+      font-size: 1.6rem;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+
+    .login-header p {
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 8px;
+    }
+
+    .form-label i {
+      font-size: 0.75rem;
+      color: #004990;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+      border-color: #004990;
+      box-shadow: 0 0 0 4px rgba(0, 73, 144, 0.1);
+      outline: none;
+    }
+
+    .form-input::placeholder {
+      color: #94a3b8;
+    }
+
+    .form-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .remember-me input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #004990;
+    }
+
+    .remember-me span {
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    .forgot-password {
+      font-size: 0.85rem;
+      color: #004990;
+      font-weight: 500;
+    }
+
+    .forgot-password:hover {
+      text-decoration: underline;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #4a90c2 0%, #6bb3e0 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-login:hover {
+      background: linear-gradient(135deg, #3a80b2 0%, #5ba3d0 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(74, 144, 194, 0.3);
+    }
+
+    .btn-login i {
+      transition: transform 0.3s ease;
+    }
+
+    .btn-login:hover i {
+      transform: translateX(4px);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 25px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e2e8f0;
+    }
+
+    .divider span {
+      padding: 0 15px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    .help-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .help-link {
+      font-size: 0.85rem;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s ease;
+    }
+
+    .help-link:hover {
+      color: #004990;
+    }
+
+    .help-link i {
+      font-size: 0.9rem;
+    }
+
+    /* 반응형 */
+    @media (max-width: 768px) {
+      .login-container {
+        flex-direction: column;
+        width: 95%;
+        max-width: 400px;
+      }
+
+      .login-brand {
+        width: 100%;
+        padding: 30px;
+      }
+
+      .login-form-section {
+        width: 100%;
+        padding: 30px;
+      }
+
+      .brand-features {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-pattern"></div>
+  <div class="clouds">
+    <div class="cloud"></div>
+    <div class="cloud"></div>
+    <div class="cloud"></div>
+  </div>
+
+  <div class="login-container">
+    <!-- 왼쪽: 브랜드 영역 -->
+    <div class="login-brand">
+      <div class="brand-logo">
+        <img src="images/korean-air-logo.svg" alt="대한항공" class="korean-air-logo">
+      </div>
+      <div class="brand-logo" style="margin-top: 20px;">
+        <i class="fas fa-users-cog" style="font-size: 1.5rem;"></i>
+        <div class="brand-logo-text">
+          <h1>SkyHR</h1>
+          <span>통합 HR 시스템</span>
+        </div>
+      </div>
+      <p class="brand-description">
+        대한항공 임직원을 위한 통합 HR 관리 시스템입니다. 
+        근태 관리, 건강 관리, 휴가 신청 등 모든 HR 서비스를 한 곳에서 관리하세요.
+      </p>
+      <div class="brand-features">
+        <div class="brand-feature">
+          <i class="fas fa-check"></i>
+          <span>간편한 근태 관리 및 일정 조회</span>
+        </div>
+        <div class="brand-feature">
+          <i class="fas fa-check"></i>
+          <span>맞춤형 건강 관리 프로그램</span>
+        </div>
+        <div class="brand-feature">
+          <i class="fas fa-check"></i>
+          <span>실시간 휴가 승인 시스템</span>
+        </div>
+        <div class="brand-feature">
+          <i class="fas fa-check"></i>
+          <span>스트레스 설문 및 건강 리포트</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 오른쪽: 로그인 폼 -->
+    <div class="login-form-section">
+      <div class="login-header">
+        <h2>로그인</h2>
+        <p>사번과 비밀번호를 입력하여 로그인하세요</p>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-id-badge"></i>
+            사번
+          </label>
+          <input type="text" id="employeeNumber" class="form-input" placeholder="사번을 입력하세요" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-lock"></i>
+            비밀번호
+          </label>
+          <input type="password" id="password" class="form-input" placeholder="비밀번호를 입력하세요" required>
+        </div>
+
+        <div class="form-options">
+          <label class="remember-me">
+            <input type="checkbox" id="rememberMe">
+            <span>로그인 상태 유지</span>
+          </label>
+          <a href="#" class="forgot-password">비밀번호 찾기</a>
+        </div>
+
+        <div id="errorMessage" style="color: #ef4444; font-size: 0.875rem; margin-bottom: 16px; display: none;"></div>
+
+        <button type="submit" class="btn-login" id="loginBtn">
+          <span id="loginText">로그인</span>
+          <i class="fas fa-arrow-right" id="loginIcon"></i>
+          <i class="fas fa-spinner fa-spin" id="loadingIcon" style="display: none;"></i>
+        </button>
+      </form>
+
+      <div class="divider">
+        <span>도움이 필요하신가요?</span>
+      </div>
+
+      <div class="help-links">
+        <a href="#" class="help-link">
+          <i class="fas fa-headset"></i>
+          IT 헬프데스크
+        </a>
+        <a href="#" class="help-link">
+          <i class="fas fa-envelope"></i>
+          문의하기
+        </a>
+        <a href="#" class="help-link">
+          <i class="fas fa-book"></i>
+          사용 가이드
+        </a>
+      </div>
+    </div>
+  </div>
+  <script src="js/api.js"></script>
+  <script>
+    // 이미 로그인된 경우 대시보드로 이동
+    if (TokenManager.isLoggedIn()) {
+      window.location.href = 'dashboard.html';
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const employeeNumber = document.getElementById('employeeNumber').value;
+      const password = document.getElementById('password').value;
+      const rememberMe = document.getElementById('rememberMe').checked;
+      
+      const loginBtn = document.getElementById('loginBtn');
+      const loginText = document.getElementById('loginText');
+      const loginIcon = document.getElementById('loginIcon');
+      const loadingIcon = document.getElementById('loadingIcon');
+      const errorMessage = document.getElementById('errorMessage');
+      
+      // 로딩 상태
+      loginBtn.disabled = true;
+      loginText.textContent = '로그인 중...';
+      loginIcon.style.display = 'none';
+      loadingIcon.style.display = 'inline-block';
+      errorMessage.style.display = 'none';
+      
+      try {
+        await AuthAPI.login(employeeNumber, password, rememberMe);
+        window.location.href = 'dashboard.html';
+      } catch (error) {
+        errorMessage.textContent = error.message || '로그인에 실패했습니다. 사번과 비밀번호를 확인해주세요.';
+        errorMessage.style.display = 'block';
+        
+        // 버튼 복원
+        loginBtn.disabled = false;
+        loginText.textContent = '로그인';
+        loginIcon.style.display = 'inline-block';
+        loadingIcon.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
+
