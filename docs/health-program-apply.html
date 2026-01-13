@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>프로그램 신청 - SkyHR | 대한항공 HR 시스템</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .apply-container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .apply-header {
+      background: linear-gradient(135deg, #4a90c2 0%, #6bb3e0 100%);
+      border-radius: var(--border-radius-lg);
+      padding: 30px;
+      color: white;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .apply-header h1 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .apply-header p {
+      opacity: 0.9;
+      font-size: 0.9rem;
+    }
+
+    .apply-form-card {
+      background: var(--white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .form-section {
+      padding: 30px;
+    }
+
+    .form-section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-section-title i {
+      color: #4a90c2;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 10px;
+    }
+
+    .form-label .required {
+      color: #ef4444;
+      margin-left: 4px;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--border-radius);
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: #4a90c2;
+      box-shadow: 0 0 0 3px rgba(74, 144, 194, 0.1);
+    }
+
+    .form-textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    .form-hint {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      margin-top: 8px;
+    }
+
+    /* 프로그램 선택 카드 */
+    .program-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .program-option {
+      border: 2px solid var(--gray-200);
+      border-radius: var(--border-radius-lg);
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .program-option:hover {
+      border-color: #4a90c2;
+      background: rgba(74, 144, 194, 0.05);
+    }
+
+    .program-option.selected {
+      border-color: #4a90c2;
+      background: linear-gradient(135deg, rgba(74, 144, 194, 0.1) 0%, rgba(107, 179, 224, 0.1) 100%);
+    }
+
+    .program-option-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: white;
+      margin: 0 auto 12px;
+    }
+
+    .program-option.counseling .program-option-icon {
+      background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+    }
+
+    .program-option.exercise .program-option-icon {
+      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    }
+
+    .program-option.rest .program-option-icon {
+      background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    }
+
+    .program-option-title {
+      font-weight: 600;
+      color: var(--gray-800);
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .program-option-desc {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    .program-option .check-mark {
+      display: none;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 24px;
+      height: 24px;
+      background: #4a90c2;
+      border-radius: 50%;
+      color: white;
+      font-size: 0.8rem;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .program-option.selected .check-mark {
+      display: flex;
+    }
+
+    /* 폼 하단 버튼 */
+    .form-actions {
+      padding: 24px 30px;
+      background: var(--gray-50);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-back {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--white);
+      border: 2px solid var(--gray-300);
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      color: var(--gray-600);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-back:hover {
+      background: var(--gray-100);
+      border-color: var(--gray-400);
+    }
+
+    .btn-submit {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #4a90c2 0%, #6bb3e0 100%);
+      border: none;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 1rem;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(74, 144, 194, 0.4);
+    }
+
+    .btn-submit:disabled {
+      background: var(--gray-300);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* 성공 모달 */
+    .success-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .success-modal-content {
+      background: white;
+      border-radius: var(--border-radius-lg);
+      padding: 40px;
+      text-align: center;
+      max-width: 400px;
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      color: white;
+      margin: 0 auto 24px;
+    }
+
+    .success-modal h2 {
+      font-size: 1.5rem;
+      color: var(--gray-800);
+      margin-bottom: 12px;
+    }
+
+    .success-modal p {
+      color: var(--gray-500);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .btn-go-list {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #4a90c2 0%, #6bb3e0 100%);
+      border: none;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-go-list:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(74, 144, 194, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      .program-options {
+        grid-template-columns: 1fr;
+      }
+
+      .form-actions {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .btn-back, .btn-submit {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-plane" style="font-size: 1.5rem;"></i>
+          <div>
+            <h1>SkyHR</h1>
+            <span>Korean Air HR System</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">메인</div>
+          <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>대시보드</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">직원 관리</div>
+          <a href="employees.html" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>직원 목록</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-sitemap"></i>
+            <span>부서 관리</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">근태 관리</div>
+          <a href="attendance.html" class="nav-item">
+            <i class="fas fa-clock"></i>
+            <span>근태 현황</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-calendar-alt"></i>
+            <span>휴가 신청</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-clipboard-check"></i>
+            <span>승인 관리</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">건강 관리</div>
+          <a href="health.html" class="nav-item">
+            <i class="fas fa-heartbeat"></i>
+            <span>건강 현황</span>
+          </a>
+          <a href="stress-survey.html" class="nav-item">
+            <i class="fas fa-poll"></i>
+            <span>스트레스 설문</span>
+          </a>
+          <a href="health-program.html" class="nav-item active">
+            <i class="fas fa-spa"></i>
+            <span>건강 프로그램</span>
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">기타</div>
+          <a href="#" class="nav-item">
+            <i class="fas fa-bullhorn"></i>
+            <span>게시판</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-file-alt"></i>
+            <span>리포트</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>설정</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+      <!-- 헤더 -->
+      <header class="header">
+        <div class="header-left">
+          <div class="breadcrumb">
+            <a href="#">홈</a>
+            <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+            <a href="health-program.html">건강 프로그램</a>
+            <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+            <span class="current">프로그램 신청</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <button class="header-icon-btn">
+            <i class="fas fa-search"></i>
+          </button>
+          <button class="header-icon-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-profile">
+            <div class="user-avatar">김</div>
+            <div class="user-info">
+              <div class="user-name">김민수</div>
+              <div class="user-role">객실 승무원</div>
+            </div>
+            <i class="fas fa-chevron-down" style="color: var(--gray-400); font-size: 0.75rem;"></i>
+          </div>
+        </div>
+      </header>
+
+      <!-- 페이지 컨텐츠 -->
+      <div class="page-content">
+        <div class="apply-container">
+          <!-- 헤더 -->
+          <div class="apply-header">
+            <h1><i class="fas fa-file-medical"></i> 건강 프로그램 신청</h1>
+            <p>건강 증진을 위한 프로그램에 신청해주세요. 관리자 승인 후 참여 가능합니다.</p>
+          </div>
+
+          <!-- 신청 폼 -->
+          <div class="apply-form-card">
+            <form id="applyForm">
+              <div class="form-section">
+                <div class="form-section-title">
+                  <i class="fas fa-clipboard-list"></i> 프로그램 선택
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">신청할 프로그램 <span class="required">*</span></label>
+                  <div class="program-options">
+                    <div class="program-option counseling" data-program="심리 상담" onclick="selectProgram(this)">
+                      <div class="check-mark"><i class="fas fa-check"></i></div>
+                      <div class="program-option-icon">
+                        <i class="fas fa-comments"></i>
+                      </div>
+                      <div class="program-option-title">심리 상담</div>
+                      <div class="program-option-desc">전문 상담사 1:1 상담</div>
+                    </div>
+                    <div class="program-option exercise" data-program="운동 프로그램" onclick="selectProgram(this)">
+                      <div class="check-mark"><i class="fas fa-check"></i></div>
+                      <div class="program-option-icon">
+                        <i class="fas fa-running"></i>
+                      </div>
+                      <div class="program-option-title">운동 프로그램</div>
+                      <div class="program-option-desc">맞춤형 체력 증진</div>
+                    </div>
+                    <div class="program-option rest" data-program="휴식 프로그램" onclick="selectProgram(this)">
+                      <div class="check-mark"><i class="fas fa-check"></i></div>
+                      <div class="program-option-icon">
+                        <i class="fas fa-bed"></i>
+                      </div>
+                      <div class="program-option-title">휴식 프로그램</div>
+                      <div class="program-option-desc">힐링 캠프 & 명상</div>
+                    </div>
+                  </div>
+                  <input type="hidden" id="selectedProgram" name="program" required>
+                </div>
+              </div>
+
+              <div class="form-section" style="border-top: 1px solid var(--gray-100);">
+                <div class="form-section-title">
+                  <i class="fas fa-calendar-alt"></i> 희망 일정
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">희망 시작일 <span class="required">*</span></label>
+                  <input type="date" class="form-input" id="applyDate" required>
+                  <p class="form-hint">프로그램 시작을 희망하는 날짜를 선택해주세요.</p>
+                </div>
+              </div>
+
+              <div class="form-section" style="border-top: 1px solid var(--gray-100);">
+                <div class="form-section-title">
+                  <i class="fas fa-pen"></i> 신청 사유
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">신청 사유 <span class="required">*</span></label>
+                  <textarea class="form-textarea" id="applyReason" placeholder="프로그램 신청 사유를 상세히 작성해주세요.&#10;&#10;예시:&#10;- 최근 장거리 비행이 많아 피로가 누적되고 있습니다.&#10;- 스트레스 관리를 위해 전문 상담을 받고 싶습니다." required></textarea>
+                  <p class="form-hint">신청 사유는 승인 심사에 참고됩니다. 구체적으로 작성해주세요.</p>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn-back" onclick="goBack()">
+                  <i class="fas fa-arrow-left"></i> 뒤로가기
+                </button>
+                <button type="submit" class="btn-submit" id="submitBtn">
+                  <i class="fas fa-paper-plane"></i> 신청하기
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 성공 모달 -->
+  <div class="success-modal" id="successModal" style="display: none;">
+    <div class="success-modal-content">
+      <div class="success-icon">
+        <i class="fas fa-check"></i>
+      </div>
+      <h2>신청이 완료되었습니다!</h2>
+      <p>관리자 승인 후 프로그램에 참여하실 수 있습니다.<br>승인 결과는 알림으로 안내드립니다.</p>
+      <button class="btn-go-list" onclick="goToList()">
+        <i class="fas fa-list"></i> 신청 내역 보기
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let selectedProgram = null;
+
+    // 오늘 날짜를 기본값으로 설정
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      const dateInput = document.getElementById('applyDate');
+      dateInput.min = tomorrow.toISOString().split('T')[0];
+      dateInput.value = tomorrow.toISOString().split('T')[0];
+    });
+
+    // 프로그램 선택
+    function selectProgram(element) {
+      // 기존 선택 해제
+      document.querySelectorAll('.program-option').forEach(opt => {
+        opt.classList.remove('selected');
+      });
+      
+      // 새 선택
+      element.classList.add('selected');
+      selectedProgram = element.dataset.program;
+      document.getElementById('selectedProgram').value = selectedProgram;
+    }
+
+    // 뒤로가기
+    function goBack() {
+      window.location.href = 'health-program.html';
+    }
+
+    // 목록으로 이동
+    function goToList() {
+      window.location.href = 'health-program.html';
+    }
+
+    // 폼 제출
+    document.getElementById('applyForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // 유효성 검사
+      if (!selectedProgram) {
+        alert('프로그램을 선택해주세요.');
+        return;
+      }
+
+      const applyDate = document.getElementById('applyDate').value;
+      const applyReason = document.getElementById('applyReason').value.trim();
+
+      if (!applyDate) {
+        alert('희망 시작일을 선택해주세요.');
+        return;
+      }
+
+      if (!applyReason) {
+        alert('신청 사유를 입력해주세요.');
+        return;
+      }
+
+      // 신청 데이터 생성
+      const application = {
+        id: Date.now(),
+        date: new Date().toISOString().split('T')[0],
+        program: selectedProgram,
+        reason: applyReason,
+        preferredDate: applyDate,
+        status: 'pending'
+      };
+
+      // localStorage에 저장
+      let applications = JSON.parse(localStorage.getItem('healthProgramApplications') || '[]');
+      applications.unshift(application);
+      localStorage.setItem('healthProgramApplications', JSON.stringify(applications));
+
+      // 성공 모달 표시
+      document.getElementById('successModal').style.display = 'flex';
+    });
+  </script>
+</body>
+</html>

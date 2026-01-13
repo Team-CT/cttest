@@ -426,26 +426,36 @@
 
     <!-- 메인 콘텐츠 -->
     <main class="main-content">
-      <header class="top-header">
+      <header class="header">
         <div class="header-left">
           <div class="breadcrumb">
-            <span>관리자</span>
-            <i class="fas fa-chevron-right"></i>
-            <span>건강 프로그램 관리</span>
+            <a href="#">홈</a>
+            <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+            <a href="#">관리자</a>
+            <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+            <span class="current">건강 프로그램 관리</span>
           </div>
         </div>
         <div class="header-right">
+          <button class="header-icon-btn">
+            <i class="fas fa-search"></i>
+          </button>
+          <button class="header-icon-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">5</span>
+          </button>
           <div class="user-profile">
             <div class="user-avatar" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);">관</div>
             <div class="user-info">
               <div class="user-name">관리자</div>
               <div class="user-role">ADMIN</div>
             </div>
+            <i class="fas fa-chevron-down" style="color: var(--gray-400); font-size: 0.75rem;"></i>
           </div>
         </div>
       </header>
 
-      <div class="content-area">
+      <div class="page-content">
         <!-- 헤더 -->
         <div class="admin-header">
           <div class="admin-badge">
@@ -457,20 +467,21 @@
 
         <!-- 탭 네비게이션 -->
         <div class="tab-nav">
-          <button class="tab-btn active">
+          <button class="tab-btn active" onclick="showTab('pending')">
             <i class="fas fa-inbox"></i> 승인 대기
             <span class="badge">3</span>
           </button>
-          <button class="tab-btn">
+          <button class="tab-btn" onclick="showTab('programs')">
             <i class="fas fa-list"></i> 프로그램 목록
           </button>
-          <button class="tab-btn">
+          <button class="tab-btn" onclick="showTab('history')">
             <i class="fas fa-history"></i> 처리 내역
           </button>
         </div>
 
         <!-- 승인 대기 목록 -->
-        <div class="pending-card">
+        <div id="tab-pending" class="tab-content">
+        <div class="pending-card" id="pending-1">
           <div class="pending-header">
             <div class="applicant-info">
               <div class="applicant-avatar">김</div>
@@ -520,7 +531,7 @@
           </div>
         </div>
 
-        <div class="pending-card">
+        <div class="pending-card" id="pending-2">
           <div class="pending-header">
             <div class="applicant-info">
               <div class="applicant-avatar">이</div>
@@ -570,7 +581,7 @@
           </div>
         </div>
 
-        <div class="pending-card">
+        <div class="pending-card" id="pending-3">
           <div class="pending-header">
             <div class="applicant-info">
               <div class="applicant-avatar">박</div>
@@ -619,6 +630,104 @@
             </div>
           </div>
         </div>
+        </div>
+
+        <!-- 프로그램 목록 -->
+        <div id="tab-programs" class="tab-content" style="display: none;">
+          <div class="program-table-card">
+            <div class="table-header">
+              <h2><i class="fas fa-list-alt"></i> 프로그램 목록</h2>
+              <button class="btn-add-program">
+                <i class="fas fa-plus"></i> 새 프로그램 추가
+              </button>
+            </div>
+            <table class="program-list-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>프로그램명</th>
+                  <th>유형</th>
+                  <th>설명</th>
+                  <th>상태</th>
+                  <th>액션</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>HP-001</td>
+                  <td>심리 상담 프로그램</td>
+                  <td>심리 상담</td>
+                  <td>전문 상담사와 1:1 상담</td>
+                  <td><span class="program-status status-active">활성</span></td>
+                  <td><button class="btn-edit"><i class="fas fa-edit"></i></button></td>
+                </tr>
+                <tr>
+                  <td>HP-002</td>
+                  <td>맞춤형 운동 프로그램</td>
+                  <td>운동</td>
+                  <td>개인별 맞춤 운동 지도</td>
+                  <td><span class="program-status status-active">활성</span></td>
+                  <td><button class="btn-edit"><i class="fas fa-edit"></i></button></td>
+                </tr>
+                <tr>
+                  <td>HP-003</td>
+                  <td>힐링 캠프</td>
+                  <td>휴식</td>
+                  <td>자연 속 심신 회복</td>
+                  <td><span class="program-status status-inactive">비활성</span></td>
+                  <td><button class="btn-edit"><i class="fas fa-edit"></i></button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 처리 내역 -->
+        <div id="tab-history" class="tab-content" style="display: none;">
+          <div class="program-table-card">
+            <div class="table-header">
+              <h2><i class="fas fa-history"></i> 처리 내역</h2>
+            </div>
+            <table class="program-list-table">
+              <thead>
+                <tr>
+                  <th>신청일</th>
+                  <th>직원명 (사번)</th>
+                  <th>프로그램</th>
+                  <th>처리일</th>
+                  <th>처리 결과</th>
+                  <th>처리자</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                <tr>
+                  <td>2026-01-08</td>
+                  <td>최영희 (EMP-2024-0512)</td>
+                  <td>심리 상담</td>
+                  <td>2026-01-09</td>
+                  <td><span class="program-status status-active">승인</span></td>
+                  <td>관리자</td>
+                </tr>
+                <tr>
+                  <td>2026-01-05</td>
+                  <td>정민우 (EMP-2023-0891)</td>
+                  <td>운동 프로그램</td>
+                  <td>2026-01-06</td>
+                  <td><span class="program-status status-active">승인</span></td>
+                  <td>관리자</td>
+                </tr>
+                <tr>
+                  <td>2026-01-03</td>
+                  <td>한소연 (EMP-2024-0234)</td>
+                  <td>휴식 프로그램</td>
+                  <td>2026-01-04</td>
+                  <td><span class="program-status status-inactive">반려</span></td>
+                  <td>관리자</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -629,10 +738,112 @@
       <h3><i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i> 반려 사유 입력</h3>
       <textarea placeholder="반려 사유를 입력해주세요. 신청자에게 전달됩니다."></textarea>
       <div class="reject-modal-actions">
-        <button class="btn-action" style="background: var(--gray-100); border: none; color: var(--gray-600);">취소</button>
-        <button class="btn-action btn-reject">반려 처리</button>
+        <button class="btn-action" style="background: var(--gray-100); border: none; color: var(--gray-600);" onclick="closeRejectModal()">취소</button>
+        <button class="btn-action btn-reject" onclick="rejectApplication()">반려 처리</button>
       </div>
     </div>
   </div>
+
+  <script>
+    let currentPendingId = null;
+
+    // 탭 전환
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+      });
+      document.getElementById('tab-' + tabId).style.display = 'block';
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.querySelector(`.tab-nav button[onclick="showTab('${tabId}')"]`).classList.add('active');
+    }
+
+    // 반려 모달 열기
+    function openRejectModal(id) {
+      currentPendingId = id;
+      document.getElementById('rejectModal').style.display = 'flex';
+    }
+
+    // 반려 모달 닫기
+    function closeRejectModal() {
+      document.getElementById('rejectModal').style.display = 'none';
+      document.querySelector('#rejectModal textarea').value = '';
+      currentPendingId = null;
+    }
+
+    // 승인 처리
+    function approveApplication(id) {
+      alert('승인처리가 완료되었습니다.');
+      moveApplicationToHistory(id, '승인', '관리자');
+      showTab('history');
+    }
+
+    // 반려 처리
+    function rejectApplication() {
+      const reason = document.querySelector('#rejectModal textarea').value;
+      if (!reason) {
+        alert('반려 사유를 입력해주세요.');
+        return;
+      }
+      alert('반려처리가 완료되었습니다.');
+      moveApplicationToHistory(currentPendingId, '반려', '관리자');
+      closeRejectModal();
+      showTab('history');
+    }
+
+    // 처리 내역으로 이동
+    function moveApplicationToHistory(id, status, processor) {
+      const card = document.getElementById('pending-' + id);
+      if (card) {
+        const applicantName = card.querySelector('.applicant-details h3').innerText.split('(')[0].trim();
+        const applicantId = card.querySelector('.applicant-details h3 span').innerText.replace(/[()]/g, '');
+        const programType = card.querySelector('.program-type').innerText.trim();
+        const applyDate = card.querySelector('.apply-date').innerText.replace('신청일: ', '').replace(/\s\d{2}:\d{2}/, '').trim();
+        const processDate = new Date().toISOString().slice(0, 10);
+
+        const historyTableBody = document.getElementById('history-table-body');
+        const newRow = historyTableBody.insertRow(0);
+        newRow.innerHTML = `
+          <td>${applyDate}</td>
+          <td>${applicantName} (${applicantId})</td>
+          <td>${programType}</td>
+          <td>${processDate}</td>
+          <td><span class="program-status ${status === '승인' ? 'status-active' : 'status-inactive'}">${status}</span></td>
+          <td>${processor}</td>
+        `;
+        card.remove();
+        updatePendingBadge();
+      }
+    }
+
+    // 대기 건수 업데이트
+    function updatePendingBadge() {
+      const pendingCount = document.querySelectorAll('#tab-pending .pending-card').length;
+      document.querySelector('.tab-nav .tab-btn:first-child .badge').innerText = pendingCount;
+    }
+
+    // 페이지 로드 시 이벤트 바인딩
+    document.addEventListener('DOMContentLoaded', () => {
+      updatePendingBadge();
+      
+      // 반려 버튼 이벤트
+      document.querySelectorAll('.pending-card .btn-reject').forEach(button => {
+        button.onclick = (event) => {
+          const id = event.target.closest('.pending-card').id.replace('pending-', '');
+          openRejectModal(id);
+        };
+      });
+      
+      // 승인 버튼 이벤트
+      document.querySelectorAll('.pending-card .btn-approve').forEach(button => {
+        button.onclick = (event) => {
+          const id = event.target.closest('.pending-card').id.replace('pending-', '');
+          approveApplication(id);
+        };
+      });
+    });
+  </script>
 </body>
 </html>

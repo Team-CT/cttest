@@ -37,15 +37,24 @@
       border-radius: var(--border-radius);
       font-weight: 600;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 8px;
       transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.95rem;
     }
 
     .btn-apply:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      color: #4a90c2;
+    }
+
+    /* 반려 상태 뱃지 */
+    .status-rejected {
+      background: #fee2e2;
+      color: #dc2626;
     }
 
     .program-grid {
@@ -435,9 +444,9 @@
             <h1><i class="fas fa-spa"></i> 건강 프로그램</h1>
             <p>직원 건강 증진을 위한 다양한 프로그램에 참여하세요</p>
           </div>
-          <button class="btn-apply" onclick="openModal()">
+          <a href="health-program-apply.html" class="btn-apply">
             <i class="fas fa-plus"></i> 프로그램 신청
-          </button>
+          </a>
         </div>
 
         <!-- 프로그램 카드 -->
@@ -500,80 +509,155 @@
                 <th>액션</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>2026-01-10</td>
-                <td>심리 상담</td>
-                <td>업무 스트레스로 인한 상담 요청</td>
-                <td><span class="status-badge status-approved">승인</span></td>
-                <td>-</td>
-              </tr>
-              <tr>
-                <td>2026-01-08</td>
-                <td>운동 프로그램</td>
-                <td>체력 증진 목적</td>
-                <td><span class="status-badge status-completed">완료</span></td>
-                <td>-</td>
-              </tr>
-              <tr>
-                <td>2026-01-12</td>
-                <td>휴식 프로그램</td>
-                <td>장거리 비행 후 피로 회복</td>
-                <td><span class="status-badge status-pending">대기중</span></td>
-                <td><button class="btn-action">취소</button></td>
-              </tr>
+            <tbody id="applicationTableBody">
+              <!-- 동적으로 로드됨 -->
             </tbody>
           </table>
+          
+          <!-- 신청 내역이 없을 때 -->
+          <div class="empty-state" id="emptyState" style="display: none; padding: 60px 20px; text-align: center;">
+            <div style="width: 80px; height: 80px; background: var(--gray-100); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; color: var(--gray-400);">
+              <i class="fas fa-clipboard-list"></i>
+            </div>
+            <h3 style="font-size: 1.1rem; color: var(--gray-700); margin-bottom: 8px;">신청 내역이 없습니다</h3>
+            <p style="font-size: 0.9rem; color: var(--gray-500); margin-bottom: 20px;">건강 프로그램에 신청해보세요!</p>
+            <a href="health-program-apply.html" class="btn-apply" style="display: inline-flex; text-decoration: none;">
+              <i class="fas fa-plus"></i> 프로그램 신청하기
+            </a>
+          </div>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- 신청 모달 -->
-  <div class="modal-overlay" id="applyModal" style="display: none;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2><i class="fas fa-file-medical"></i> 건강 프로그램 신청</h2>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>프로그램 유형 *</label>
-          <select>
-            <option value="">프로그램을 선택하세요</option>
-            <option value="counseling">심리 상담 프로그램</option>
-            <option value="exercise">운동 프로그램</option>
-            <option value="rest">휴식 프로그램</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>신청 사유 *</label>
-          <textarea placeholder="프로그램 신청 사유를 입력해주세요."></textarea>
-        </div>
-        <div class="form-group">
-          <label>희망 일정</label>
-          <select>
-            <option value="">희망하는 일정을 선택하세요</option>
-            <option value="asap">가능한 빠른 시일</option>
-            <option value="week1">1주 이내</option>
-            <option value="week2">2주 이내</option>
-            <option value="month1">1개월 이내</option>
-          </select>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-modal btn-cancel" onclick="closeModal()">취소</button>
-        <button class="btn-modal btn-submit">신청하기</button>
-      </div>
-    </div>
+  <!-- 토스트 알림 -->
+  <div id="toast" class="toast" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: linear-gradient(135deg, #10b981 0%, #34d399 100%); color: white; padding: 16px 28px; border-radius: 50px; align-items: center; gap: 12px; font-weight: 500; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4); z-index: 2000; opacity: 0; transition: all 0.3s ease;">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMessage"></span>
   </div>
 
   <script>
-    function openModal() {
-      document.getElementById('applyModal').style.display = 'flex';
+    // 기본 샘플 데이터
+    const sampleData = [
+      {
+        id: 1,
+        date: '2026-01-10',
+        program: '심리 상담',
+        reason: '업무 스트레스로 인한 상담 요청',
+        status: 'approved'
+      },
+      {
+        id: 2,
+        date: '2026-01-08',
+        program: '운동 프로그램',
+        reason: '체력 증진 목적',
+        status: 'completed'
+      }
+    ];
+
+    // 페이지 로드 시 신청 내역 불러오기
+    document.addEventListener('DOMContentLoaded', function() {
+      loadApplications();
+    });
+
+    // 신청 내역 로드
+    function loadApplications() {
+      const tbody = document.getElementById('applicationTableBody');
+      const emptyState = document.getElementById('emptyState');
+      
+      // localStorage에서 신청 내역 불러오기
+      let applications = JSON.parse(localStorage.getItem('healthProgramApplications') || '[]');
+      
+      // 샘플 데이터 + 새로운 신청 내역 합치기
+      const allApplications = [...applications, ...sampleData];
+      
+      if (allApplications.length === 0) {
+        tbody.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+      
+      tbody.innerHTML = '';
+      emptyState.style.display = 'none';
+      
+      allApplications.forEach(app => {
+        const row = document.createElement('tr');
+        
+        // 상태 뱃지 결정
+        let statusClass = '';
+        let statusText = '';
+        switch(app.status) {
+          case 'pending':
+            statusClass = 'status-pending';
+            statusText = '대기중';
+            break;
+          case 'approved':
+            statusClass = 'status-approved';
+            statusText = '승인';
+            break;
+          case 'completed':
+            statusClass = 'status-completed';
+            statusText = '완료';
+            break;
+          case 'rejected':
+            statusClass = 'status-rejected';
+            statusText = '반려';
+            break;
+          default:
+            statusClass = 'status-pending';
+            statusText = '대기중';
+        }
+        
+        // 신청 사유 줄이기
+        const shortReason = app.reason.length > 30 ? app.reason.substring(0, 30) + '...' : app.reason;
+        
+        // 취소 버튼 (대기중인 경우만)
+        const actionCell = app.status === 'pending' 
+          ? `<button class="btn-action" onclick="cancelApplication(${app.id})">취소</button>`
+          : '-';
+        
+        row.innerHTML = `
+          <td>${app.date}</td>
+          <td>${app.program}</td>
+          <td title="${app.reason}">${shortReason}</td>
+          <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+          <td>${actionCell}</td>
+        `;
+        
+        tbody.appendChild(row);
+      });
     }
-    function closeModal() {
-      document.getElementById('applyModal').style.display = 'none';
+
+    // 신청 취소
+    function cancelApplication(id) {
+      if (!confirm('정말 신청을 취소하시겠습니까?')) {
+        return;
+      }
+      
+      let applications = JSON.parse(localStorage.getItem('healthProgramApplications') || '[]');
+      applications = applications.filter(app => app.id !== id);
+      localStorage.setItem('healthProgramApplications', JSON.stringify(applications));
+      
+      showToast('신청이 취소되었습니다.');
+      loadApplications();
+    }
+
+    // 토스트 메시지 표시
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      toastMessage.textContent = message;
+      toast.style.display = 'flex';
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(100px)';
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 300);
+      }, 2500);
     }
   </script>
 </body>
