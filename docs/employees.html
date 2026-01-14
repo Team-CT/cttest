@@ -236,6 +236,132 @@
       background: var(--gray-200);
     }
 
+    /* 드롭다운 메뉴 */
+    .dropdown-container {
+      position: relative;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-lg);
+      min-width: 140px;
+      z-index: 1000;
+      display: none;
+      overflow: hidden;
+    }
+
+    .dropdown-menu.show {
+      display: block;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      color: var(--gray-700);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .dropdown-item:hover {
+      background: var(--gray-50);
+      color: var(--primary-blue);
+    }
+
+    .dropdown-item i {
+      width: 16px;
+      text-align: center;
+      color: var(--gray-400);
+    }
+
+    .dropdown-item:hover i {
+      color: var(--primary-blue);
+    }
+
+    /* 모달 추가 스타일 - style.css의 모달 스타일 활용 */
+    .modal-employee-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+      padding: 16px;
+      background: var(--gray-50);
+      border-radius: var(--border-radius);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: 8px;
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--border-radius);
+      font-size: 0.9rem;
+      color: var(--gray-700);
+      background: var(--white);
+      cursor: pointer;
+      transition: border-color var(--transition-fast);
+    }
+
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(0, 90, 158, 0.1);
+    }
+
+    .btn-cancel {
+      padding: 10px 20px;
+      border: 1px solid var(--gray-300);
+      background: var(--white);
+      color: var(--gray-700);
+      border-radius: var(--border-radius);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-cancel:hover {
+      background: var(--gray-50);
+    }
+
+    .btn-save {
+      padding: 10px 20px;
+      border: none;
+      background: var(--primary-blue);
+      color: var(--white);
+      border-radius: var(--border-radius);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-save:hover {
+      background: var(--primary-blue-dark);
+    }
+
     /* 반응형 */
     @media (max-width: 1024px) {
       .employee-row {
@@ -387,9 +513,6 @@
             <h1 class="page-title">직원 관리</h1>
             <p class="page-subtitle">전체 직원 정보를 조회하고 관리할 수 있습니다</p>
           </div>
-          <button class="btn btn-primary">
-            <i class="fas fa-plus"></i> 직원 등록
-          </button>
         </div>
 
         <!-- 부서 탭 -->
@@ -467,15 +590,21 @@
               <span class="badge badge-success">재직</span>
             </div>
             <div class="employee-actions">
-              <button class="action-btn" title="상세보기">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn" title="수정">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn" title="더보기">
-                <i class="fas fa-ellipsis-v"></i>
-              </button>
+              <div class="dropdown-container">
+                <button class="action-btn dropdown-toggle" title="더보기" data-employee="김민수" data-dept="객실 승무원" data-position="선임 승무원">
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <button class="dropdown-item edit-employee">
+                    <i class="fas fa-edit"></i>
+                    <span>수정하기</span>
+                  </button>
+                  <button class="dropdown-item view-employee">
+                    <i class="fas fa-eye"></i>
+                    <span>상세보기</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -504,15 +633,21 @@
               <span class="badge badge-success">재직</span>
             </div>
             <div class="employee-actions">
-              <button class="action-btn" title="상세보기">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn" title="수정">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn" title="더보기">
-                <i class="fas fa-ellipsis-v"></i>
-              </button>
+              <div class="dropdown-container">
+                <button class="action-btn dropdown-toggle" title="더보기" data-employee="박지현" data-dept="운항 승무원" data-position="기장">
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <button class="dropdown-item edit-employee">
+                    <i class="fas fa-edit"></i>
+                    <span>수정하기</span>
+                  </button>
+                  <button class="dropdown-item view-employee">
+                    <i class="fas fa-eye"></i>
+                    <span>상세보기</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -541,15 +676,21 @@
               <span class="badge badge-warning">휴가</span>
             </div>
             <div class="employee-actions">
-              <button class="action-btn" title="상세보기">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn" title="수정">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn" title="더보기">
-                <i class="fas fa-ellipsis-v"></i>
-              </button>
+              <div class="dropdown-container">
+                <button class="action-btn dropdown-toggle" title="더보기" data-employee="이수진" data-dept="객실 승무원" data-position="승무원">
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <button class="dropdown-item edit-employee">
+                    <i class="fas fa-edit"></i>
+                    <span>수정하기</span>
+                  </button>
+                  <button class="dropdown-item view-employee">
+                    <i class="fas fa-eye"></i>
+                    <span>상세보기</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -578,15 +719,21 @@
               <span class="badge badge-success">재직</span>
             </div>
             <div class="employee-actions">
-              <button class="action-btn" title="상세보기">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn" title="수정">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn" title="더보기">
-                <i class="fas fa-ellipsis-v"></i>
-              </button>
+              <div class="dropdown-container">
+                <button class="action-btn dropdown-toggle" title="더보기" data-employee="최영호" data-dept="정비팀" data-position="선임 정비사">
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <button class="dropdown-item edit-employee">
+                    <i class="fas fa-edit"></i>
+                    <span>수정하기</span>
+                  </button>
+                  <button class="dropdown-item view-employee">
+                    <i class="fas fa-eye"></i>
+                    <span>상세보기</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -615,15 +762,21 @@
               <span class="badge badge-primary">교육</span>
             </div>
             <div class="employee-actions">
-              <button class="action-btn" title="상세보기">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn" title="수정">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn" title="더보기">
-                <i class="fas fa-ellipsis-v"></i>
-              </button>
+              <div class="dropdown-container">
+                <button class="action-btn dropdown-toggle" title="더보기" data-employee="정하나" data-dept="지상직" data-position="게이트 매니저">
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <button class="dropdown-item edit-employee">
+                    <i class="fas fa-edit"></i>
+                    <span>수정하기</span>
+                  </button>
+                  <button class="dropdown-item view-employee">
+                    <i class="fas fa-eye"></i>
+                    <span>상세보기</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -652,15 +805,21 @@
               <span class="badge badge-success">재직</span>
             </div>
             <div class="employee-actions">
-              <button class="action-btn" title="상세보기">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn" title="수정">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn" title="더보기">
-                <i class="fas fa-ellipsis-v"></i>
-              </button>
+              <div class="dropdown-container">
+                <button class="action-btn dropdown-toggle" title="더보기" data-employee="한소희" data-dept="객실 승무원" data-position="사무장">
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <button class="dropdown-item edit-employee">
+                    <i class="fas fa-edit"></i>
+                    <span>수정하기</span>
+                  </button>
+                  <button class="dropdown-item view-employee">
+                    <i class="fas fa-eye"></i>
+                    <span>상세보기</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -684,6 +843,268 @@
       </div>
     </main>
   </div>
+
+  <!-- 직원 수정 모달 -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">직원 정보 수정</h3>
+        <button class="modal-close" id="closeModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-employee-info">
+          <div class="employee-avatar" id="modalAvatar">김</div>
+          <div>
+            <div class="employee-name" id="modalName">김민수</div>
+            <div class="employee-id" id="modalId">EMP-2024-0847</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">부서</label>
+          <select class="form-select" id="editDept">
+            <option value="객실 승무원">객실 승무원</option>
+            <option value="운항 승무원">운항 승무원</option>
+            <option value="정비팀">정비팀</option>
+            <option value="지상직">지상직</option>
+            <option value="관리직">관리직</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">직급</label>
+          <select class="form-select" id="editPosition">
+            <option value="기장">기장</option>
+            <option value="부기장">부기장</option>
+            <option value="사무장">사무장</option>
+            <option value="선임 승무원">선임 승무원</option>
+            <option value="승무원">승무원</option>
+            <option value="선임 정비사">선임 정비사</option>
+            <option value="정비사">정비사</option>
+            <option value="게이트 매니저">게이트 매니저</option>
+            <option value="매니저">매니저</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="cancelBtn">취소</button>
+        <button class="btn-save" id="saveBtn">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 직원 상세보기 모달 -->
+  <div class="modal-overlay" id="viewModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">직원 상세 정보</h3>
+        <button class="modal-close" id="closeViewModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-employee-info" style="margin-bottom: 24px;">
+          <div class="employee-avatar" id="viewModalAvatar">김</div>
+          <div>
+            <div class="employee-name" id="viewModalName">김민수</div>
+            <div class="employee-id" id="viewModalId">EMP-2024-0847</div>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="detail-label">부서</div>
+            <div class="detail-value" id="viewModalDept">객실 승무원</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">직급</div>
+            <div class="detail-value" id="viewModalPosition">선임 승무원</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">입사일</div>
+            <div class="detail-value" id="viewModalDate">2019-03-15</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">상태</div>
+            <div class="detail-value" id="viewModalStatus">재직</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-save" id="closeViewBtn">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .detail-item {
+      padding: 12px;
+      background: var(--gray-50);
+      border-radius: 8px;
+    }
+    .detail-label {
+      font-size: 12px;
+      color: var(--gray-500);
+      margin-bottom: 4px;
+    }
+    .detail-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gray-900);
+    }
+  </style>
+
+  <script>
+    // 현재 수정 중인 직원 행
+    let currentEmployeeRow = null;
+
+    // 드롭다운 토글
+    document.querySelectorAll('.dropdown-toggle').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        // 다른 열린 드롭다운 닫기
+        document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+          if (menu !== this.nextElementSibling) {
+            menu.classList.remove('show');
+          }
+        });
+        
+        // 현재 드롭다운 토글
+        this.nextElementSibling.classList.toggle('show');
+      });
+    });
+
+    // 문서 클릭 시 드롭다운 닫기
+    document.addEventListener('click', function() {
+      document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+        menu.classList.remove('show');
+      });
+    });
+
+    // 수정하기 버튼 클릭
+    document.querySelectorAll('.edit-employee').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        // 드롭다운 닫기
+        this.closest('.dropdown-menu').classList.remove('show');
+        
+        // 직원 정보 가져오기
+        const toggleBtn = this.closest('.dropdown-container').querySelector('.dropdown-toggle');
+        const employeeName = toggleBtn.dataset.employee;
+        const dept = toggleBtn.dataset.dept;
+        const position = toggleBtn.dataset.position;
+        
+        // 직원 행 저장
+        currentEmployeeRow = this.closest('.employee-row');
+        
+        // 모달에 정보 표시
+        document.getElementById('modalAvatar').textContent = employeeName.charAt(0);
+        document.getElementById('modalName').textContent = employeeName;
+        document.getElementById('editDept').value = dept;
+        document.getElementById('editPosition').value = position;
+        
+        // 모달 열기
+        document.getElementById('editModal').classList.add('active');
+      });
+    });
+
+    // 모달 닫기
+    function closeModal() {
+      document.getElementById('editModal').classList.remove('active');
+      currentEmployeeRow = null;
+    }
+
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+    document.getElementById('cancelBtn').addEventListener('click', closeModal);
+    
+    // 모달 바깥 클릭 시 닫기
+    document.getElementById('editModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+
+    // 저장하기
+    document.getElementById('saveBtn').addEventListener('click', function() {
+      if (currentEmployeeRow) {
+        const newDept = document.getElementById('editDept').value;
+        const newPosition = document.getElementById('editPosition').value;
+        
+        // 화면의 부서와 직급 업데이트
+        const cols = currentEmployeeRow.querySelectorAll('.employee-col');
+        cols[0].querySelector('.employee-col-value').textContent = newDept;
+        cols[1].querySelector('.employee-col-value').textContent = newPosition;
+        
+        // 드롭다운 버튼의 data 속성도 업데이트
+        const toggleBtn = currentEmployeeRow.querySelector('.dropdown-toggle');
+        toggleBtn.dataset.dept = newDept;
+        toggleBtn.dataset.position = newPosition;
+        
+        // 모달 닫기
+        closeModal();
+        
+        // 성공 알림 (실제 환경에서는 서버에 저장)
+        alert('직원 정보가 수정되었습니다.');
+      }
+    });
+
+    // 상세보기 버튼 클릭
+    document.querySelectorAll('.view-employee').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        // 드롭다운 닫기
+        this.closest('.dropdown-menu').classList.remove('show');
+        
+        // 직원 행에서 정보 가져오기
+        const employeeRow = this.closest('.employee-row');
+        const toggleBtn = employeeRow.querySelector('.dropdown-toggle');
+        const employeeName = toggleBtn.dataset.employee;
+        const dept = toggleBtn.dataset.dept;
+        const position = toggleBtn.dataset.position;
+        
+        // 직원 정보 추가로 가져오기
+        const employeeId = employeeRow.querySelector('.employee-id').textContent;
+        const cols = employeeRow.querySelectorAll('.employee-col');
+        const hireDate = cols[2].querySelector('.employee-col-value').textContent;
+        const statusEl = employeeRow.querySelector('.badge');
+        const status = statusEl ? statusEl.textContent : '재직';
+        
+        // 모달에 정보 표시
+        document.getElementById('viewModalAvatar').textContent = employeeName.charAt(0);
+        document.getElementById('viewModalName').textContent = employeeName;
+        document.getElementById('viewModalId').textContent = employeeId;
+        document.getElementById('viewModalDept').textContent = dept;
+        document.getElementById('viewModalPosition').textContent = position;
+        document.getElementById('viewModalDate').textContent = hireDate;
+        document.getElementById('viewModalStatus').textContent = status;
+        
+        // 모달 열기
+        document.getElementById('viewModal').classList.add('active');
+      });
+    });
+
+    // 상세보기 모달 닫기
+    function closeViewModal() {
+      document.getElementById('viewModal').classList.remove('active');
+    }
+
+    document.getElementById('closeViewModal').addEventListener('click', closeViewModal);
+    document.getElementById('closeViewBtn').addEventListener('click', closeViewModal);
+    
+    // 상세보기 모달 바깥 클릭 시 닫기
+    document.getElementById('viewModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeViewModal();
+      }
+    });
+  </script>
 </body>
 </html>
 
